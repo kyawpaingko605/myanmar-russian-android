@@ -1,5 +1,10 @@
 package com.myanmarrussian.ui
 
+// ဒီလိုင်းတွေကို ProTutorFragment.kt ရဲ့ အပေါ်ဆုံးပိုင်းမှာ ထည့်ပေးပါ
+import com.myanmarrussian.api.TutorApiService
+import com.myanmarrussian.api.TutorRequest
+import com.myanmarrussian.api.HistoryItem
+
 import android.app.AlertDialog
 import android.os.Bundle
 import android.speech.tts.TextToSpeech

@@ -35,9 +35,12 @@ app.post('/api/tutor', async (req, res) => {
 
     const systemPrompt = getSystemPrompt(mode, langMode);
 
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+    // ပိုမိုတည်ငြိမ်ပြီး အလုပ်လုပ်မည့် Model Name သို့ ပြောင်းထားပါသည်
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
+    // startChat ထဲတွင် systemInstruction ကို စနစ်တကျ ထည့်သွင်းထားပါသည်
     const chat = model.startChat({
+      systemInstruction: systemPrompt,
       history: history.map(msg => ({
         role: msg.role === 'user' ? 'user' : 'model',
         parts: [{ text: msg.text }],

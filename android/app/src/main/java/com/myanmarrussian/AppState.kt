@@ -12,7 +12,7 @@ object AppState {
     private const val PREFS_NAME = "myanmar_russian_prefs"
     private const val KEY_API_KEY = "apiKey"
     private const val KEY_BACKEND_URL = "backendUrl"
-    private const val DEFAULT_BACKEND_URL = "http://localhost:3000"
+    private const val DEFAULT_BACKEND_URL = "https://ai-agent-app-6dmy.onrender.com"
 
     private lateinit var prefs: SharedPreferences
 

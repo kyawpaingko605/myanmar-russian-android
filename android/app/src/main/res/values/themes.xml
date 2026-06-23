@@ -6,9 +6,12 @@
         <item name="colorOnPrimary">@color/text_white</item>
         <item name="colorSecondary">@color/accent_blue</item>
         <item name="colorOnSecondary">@color/text_white</item>
+        
         <item name="android:colorBackground">@color/background</item>
         <item name="colorSurface">@color/surface</item>
-        <item name="android:statusBarColor">@color/primary</item>
+        
+        <item name="android:statusBarColor">#FFFFFF</item>
+        <item name="android:windowLightStatusBar">true</item>
     </style>
 
     <style name="Theme.MyanmarRussianLearner.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />

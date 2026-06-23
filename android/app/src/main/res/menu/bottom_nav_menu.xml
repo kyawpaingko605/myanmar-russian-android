@@ -1,23 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    
     <item
         android:id="@+id/nav_home"
         android:icon="@drawable/ic_home"
-        android:title="@string/nav_home" />
+        android:title="@string/nav_home"
+        app:showAsAction="ifRoom" />
+        
     <item
         android:id="@+id/nav_flashcards"
         android:icon="@drawable/ic_cards"
-        android:title="@string/nav_flashcards" />
+        android:title="@string/nav_flashcards"
+        app:showAsAction="ifRoom" />
+        
     <item
         android:id="@+id/nav_quiz"
         android:icon="@drawable/ic_quiz"
-        android:title="@string/nav_quiz" />
+        android:title="@string/nav_quiz"
+        app:showAsAction="ifRoom" />
+        
     <item
         android:id="@+id/nav_tutor"
         android:icon="@drawable/ic_tutor"
-        android:title="@string/nav_tutor" />
+        android:title="@string/nav_tutor"
+        app:showAsAction="ifRoom" />
+        
     <item
         android:id="@+id/nav_progress"
         android:icon="@drawable/ic_progress"
-        android:title="@string/nav_progress" />
+        android:title="@string/nav_progress"
+        app:showAsAction="ifRoom" />
+        
 </menu>

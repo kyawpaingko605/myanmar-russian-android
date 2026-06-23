@@ -1,42 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="20dp">
+    android:padding="24dp"
+    android:background="@color/background">
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/settings_title"
         android:textColor="@color/text_primary"
-        android:textSize="18sp"
+        android:textSize="20sp"
         android:textStyle="bold"
-        android:layout_marginBottom="16dp" />
+        android:layout_marginBottom="20dp" />
 
-    <TextView
+    <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/backend_url_label"
-        android:textColor="@color/text_primary"
-        android:textSize="14sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="8dp" />
+        android:layout_marginBottom="24dp"
+        android:hint="@string/backend_url_label"
+        app:hintTextColor="@color/accent_blue"
+        app:boxStrokeColor="@color/accent_blue"
+        app:boxCornerRadiusTopStart="12dp"
+        app:boxCornerRadiusTopEnd="12dp"
+        app:boxCornerRadiusBottomStart="12dp"
+        app:boxCornerRadiusBottomEnd="12dp"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
-    <EditText
-        android:id="@+id/et_backend_url"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="http://localhost:3000"
-        android:text="http://localhost:3000"
-        android:textSize="14sp"
-        android:background="@drawable/bg_input_field"
-        android:padding="12dp"
-        android:inputType="textUri"
-        android:layout_marginBottom="16dp" />
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/et_backend_url"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="http://localhost:3000"
+            android:textColor="@color/text_primary"
+            android:textSize="15sp"
+            android:inputType="textUri"
+            android:paddingVertical="14dp" />
+    </com.google.android.material.textfield.TextInputLayout>
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_done"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -44,7 +49,10 @@
         android:textColor="@color/text_white"
         android:textSize="16sp"
         android:textStyle="bold"
-        android:background="@drawable/bg_btn_primary"
-        android:padding="12dp" />
+        app:backgroundTint="@color/primary"
+        app:cornerRadius="12dp"
+        android:padding="14dp"
+        android:insetTop="0dp"
+        android:insetBottom="0dp" />
 
 </LinearLayout>

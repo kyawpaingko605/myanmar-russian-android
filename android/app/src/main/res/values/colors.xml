@@ -1,47 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Primary colors (Red gradient from iOS) -->
-    <color name="primary">#CC3333</color>
-    <color name="primary_dark">#AA1111</color>
-    <color name="primary_light">#F28033</color>
-    <color name="primary_gradient_start">#E64D4D</color>
-    <color name="primary_gradient_end">#F28033</color>
+    <color name="primary">#007AFF</color>
+    <color name="primary_dark">#0056B3</color>
+    <color name="primary_light">#5856D6</color>
+    <color name="primary_gradient_start">#007AFF</color>
+    <color name="primary_gradient_end">#5856D6</color>
 
-    <!-- Accent colors -->
-    <color name="accent_blue">#3399E6</color>
-    <color name="accent_purple">#9933CC</color>
-    <color name="accent_green">#1AB380</color>
-    <color name="accent_orange">#E69919</color>
+    <color name="accent_blue">#007AFF</color>
+    <color name="accent_purple">#AF52DE</color>
+    <color name="accent_green">#34C759</color>
+    <color name="accent_orange">#FF9500</color>
 
-    <!-- Background colors -->
     <color name="background">#FFFFFF</color>
-    <color name="surface">#F5F5F5</color>
-    <color name="card_background">#F0F0F0</color>
+    <color name="surface">#F2F2F7</color>
+    <color name="card_background">#E5E5EA</color>
 
-    <!-- Text colors -->
-    <color name="text_primary">#1A1A1A</color>
-    <color name="text_secondary">#666666</color>
+    <color name="text_primary">#1C1C1E</color>
+    <color name="text_secondary">#8E8E93</color>
     <color name="text_white">#FFFFFF</color>
     <color name="text_white_70">#B3FFFFFF</color>
 
-    <!-- Status colors -->
-    <color name="correct_green">#4CAF50</color>
-    <color name="wrong_red">#F44336</color>
+    <color name="correct_green">#34C759</color>
+    <color name="wrong_red">#FF3B30</color>
     <color name="correct_bg">#E8F5E9</color>
     <color name="wrong_bg">#FFEBEE</color>
 
-    <!-- Navigation -->
-    <color name="nav_selected">#CC3333</color>
-    <color name="nav_unselected">#999999</color>
+    <color name="nav_selected">#007AFF</color>
+    <color name="nav_unselected">#8E8E93</color>
 
-    <!-- Progress bar -->
-    <color name="progress_green">#1AB380</color>
-    <color name="progress_purple">#9933CC</color>
-    <color name="progress_blue">#3399E6</color>
-    <color name="progress_red">#CC3333</color>
-    <color name="progress_orange">#E69919</color>
+    <color name="progress_green">#30B0C7</color> <color name="progress_purple">#AF52DE</color>
+    <color name="progress_blue">#007AFF</color>
+    <color name="progress_red">#FF3B30</color>
+    <color name="progress_orange">#FF9500</color>
 
-    <!-- Chat bubbles -->
-    <color name="user_bubble">#3399E6</color>
-    <color name="assistant_bubble">#F0F0F0</color>
+    <color name="user_bubble">#007AFF</color>
+    <color name="assistant_bubble">#E5E5EA</color>
 </resources>

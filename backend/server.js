@@ -35,16 +35,27 @@ app.post('/api/tutor', async (req, res) => {
 
     const systemPrompt = getSystemPrompt(mode, langMode);
 
-    // ပိုမိုတည်ငြိမ်ပြီး အလုပ်လုပ်မည့် Model Name သို့ ပြောင်းထားပါသည်
+    // ပိုမိုသဟဇာတဖြစ်ပြီး အလုပ်လုပ်သေချာသော gemini-1.5-flash ကို သုံးထားပါသည်
     const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
-    // startChat ထဲတွင် systemInstruction ကို စနစ်တကျ ထည့်သွင်းထားပါသည်
-    const chat = model.startChat({
-      systemInstruction: systemPrompt,
-      history: history.map(msg => ({
+    // Package Version အားလုံးနှင့် အဆင်ပြေစေရန် စည်းကမ်းချက်ကို Contents ထဲတွင် တိုက်ရိုက်ထည့်သွင်းခြင်း
+    const formattedHistory = [
+      {
+        role: 'user',
+        parts: [{ text: systemPrompt + "\n\nUnderstood? Acknowledge this and wait for my message." }]
+      },
+      {
+        role: 'model',
+        parts: [{ text: "I understand the rules. I am your expert Russian tutor. Let's begin!" }]
+      },
+      ...history.map(msg => ({
         role: msg.role === 'user' ? 'user' : 'model',
         parts: [{ text: msg.text }],
-      })),
+      }))
+    ];
+
+    const chat = model.startChat({
+      history: formattedHistory,
       generationConfig: {
         temperature: 0.8,
         maxOutputTokens: 1024,
@@ -71,17 +82,12 @@ app.post('/api/tutor', async (req, res) => {
 // Vocabulary endpoint
 app.get('/api/vocabulary', (req, res) => {
   const vocabulary = [
-    // Greetings
     { id: 'g1', category: 'greetings', myanmar: 'မင်္ဂလာပါ', russian: 'Привет', pronunciation: 'Privet' },
     { id: 'g2', category: 'greetings', myanmar: 'ကောင်းပါတယ်', russian: 'Спасибо', pronunciation: 'Spasibo' },
     { id: 'g3', category: 'greetings', myanmar: 'ကျေးဇူးတင်ပါတယ်', russian: 'Пожалуйста', pronunciation: 'Pozhaluysta' },
-
-    // Numbers
     { id: 'n1', category: 'numbers', myanmar: 'တစ်', russian: 'Один', pronunciation: 'Odin' },
     { id: 'n2', category: 'numbers', myanmar: 'နှစ်', russian: 'Два', pronunciation: 'Dva' },
     { id: 'n3', category: 'numbers', myanmar: 'သုံး', russian: 'Три', pronunciation: 'Tri' },
-
-    // Common phrases
     { id: 'c1', category: 'common', myanmar: 'ကျွန်တော် ရုရှားဘာသာ သင်ချင်ပါတယ်', russian: 'Я хочу учить русский язык', pronunciation: 'Ya khochu uchit russkiy yazyk' },
     { id: 'c2', category: 'common', myanmar: 'ဒါကို ရုရှားလို ဘယ်လိုပြောလဲ?', russian: 'Как это сказать по-русски?', pronunciation: 'Kak eto skazat po-russki?' },
   ];

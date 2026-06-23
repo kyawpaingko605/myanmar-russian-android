@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/nav_home">
+
+    <fragment
+        android:id="@+id/nav_home"
+        android:name="com.myanmarrussian.ui.HomeFragment"
+        android:label="Home" />
+
+    <fragment
+        android:id="@+id/nav_flashcards"
+        android:name="com.myanmarrussian.ui.FlashcardsFragment"
+        android:label="Flashcards" />
+
+    <fragment
+        android:id="@+id/nav_quiz"
+        android:name="com.myanmarrussian.ui.QuizFragment"
+        android:label="Quiz" />
+
+    <fragment
+        android:id="@+id/nav_tutor"
+        android:name="com.myanmarrussian.ui.ProTutorFragment"
+        android:label="Pro Tutor" />
+
+    <fragment
+        android:id="@+id/nav_progress"
+        android:name="com.myanmarrussian.ui.ProgressFragment"
+        android:label="Progress" />
+
+</navigation>

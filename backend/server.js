@@ -35,10 +35,10 @@ app.post('/api/tutor', async (req, res) => {
 
     const systemPrompt = getSystemPrompt(mode, langMode);
 
-    // v1 API ဗားရှင်းအားလုံးနှင့် သေချာပေါက်အလုပ်လုပ်မည့် 'gemini-pro' ကို ပြန်ပြောင်းထားပါသည်
-    const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
+    // အလုပ်လုပ်မည့် gemini-1.5-flash သို့ ပြောင်းလဲပြင်ဆင်ထားပါသည်
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
-    // ဗားရှင်းဟောင်း SDK များအတွက် စည်းကမ်းချက် (System Prompt) ကို စကားပြောခန်းအစ၌ ထည့်သွင်းခြင်း
+    // စနစ်တကျ သမိုင်းကြောင်းနှင့် System Prompt ကို တွဲဖက်ပေးခြင်း
     const formattedHistory = [
       {
         role: 'user',

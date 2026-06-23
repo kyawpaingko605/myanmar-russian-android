@@ -1,0 +1,40 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    # ၁။ Java Environment သတ်မှတ်ခြင်း
+    - name: set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: gradle
+
+    # ၂။ Gradle Script ကို Run ခွင့်ပေးခြင်း
+    - name: Grant execute permission for gradlew
+      run: |
+        cd android
+        chmod +x gradlew
+
+    # ၃။ APK Build ထုတ်ခြင်း (Debug APK)
+    - name: Build with Gradle
+      run: |
+        cd android
+        ./gradlew assembleDebug
+
+    # ၄။ ထွက်လာသည့် APK ကို GitHub Artifact အနေဖြင့် သိမ်းဆည်းခြင်း
+    - name: Upload APK Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: app-debug
+        path: android/app/build/outputs/apk/debug/app-debug.apk

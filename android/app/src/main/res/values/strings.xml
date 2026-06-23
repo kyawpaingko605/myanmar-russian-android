@@ -1,61 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">မြန်မာ-Русский</string>
-    <string name="nav_home">Home</string>
-    <string name="nav_flashcards">Flashcards</string>
-    <string name="nav_quiz">Quiz</string>
-    <string name="nav_tutor">Pro Tutor</string>
-    <string name="nav_progress">Progress</string>
+    <string name="nav_home">ပင်မစာမျက်နှာ</string>
+    <string name="nav_flashcards">ကတ်ပြားများ</string>
+    <string name="nav_quiz">ဉာဏ်စမ်း</string>
+    <string name="nav_tutor">အိုင်အေနည်းပြ</string>
+    <string name="nav_progress">မှတ်တမ်း</string>
 
-    <!-- Home -->
     <string name="home_title">မြန်မာ-Русский</string>
     <string name="home_subtitle">Language Learner</string>
     <string name="streak_label">ဆက်တိုက်ရက်</string>
-    <string name="words_learned_label">သင်ယူပြီး</string>
-    <string name="success_rate_label">အောင်မြင်မှု</string>
+    <string name="words_learned_label">လေ့လာပြီး</string>
+    <string name="success_rate_label">အောင်မြင်မှုနှုန်း</string>
     <string name="feature_flashcards">Flashcards</string>
-    <string name="feature_flashcards_sub">စကားလုံးများ သင်ယူခြင်း</string>
+    <string name="feature_flashcards_sub">ဝေါဟာရစကားလုံးများ လေ့လာခြင်း</string>
     <string name="feature_quiz">Quiz</string>
-    <string name="feature_quiz_sub">ပညာရေးတွေ စမ်းသပ်ခြင်း</string>
+    <string name="feature_quiz_sub">ဗဟုသုတများ စမ်းသပ်စစ်ဆေးခြင်း</string>
     <string name="feature_tutor">Pro Tutor</string>
-    <string name="feature_tutor_sub">AI နဲ့ စကားပြောခြင်း</string>
+    <string name="feature_tutor_sub">AI နှင့် အပြန်အလှန် စကားပြောခြင်း</string>
 
-    <!-- Flashcards -->
     <string name="flashcards_title">🃏 Flashcards</string>
-    <string name="tap_to_flip">Tap to flip</string>
+    <string name="tap_to_flip">လှန်ကြည့်ရန် နှိပ်ပါ</string>
     <string name="myanmar_label">မြန်မာ</string>
     <string name="russian_label">ရုရှား</string>
-    <string name="listen_btn">ကြားကြည့်</string>
+    <string name="listen_btn">အသံနားထောင်မည်</string>
 
-    <!-- Quiz -->
     <string name="quiz_title">🧠 Quiz</string>
-    <string name="next_question">နောက်တစ်ခု</string>
-    <string name="finish_quiz">ပြီးစီးပါပြီ</string>
-    <string name="quiz_complete">✨ အောင်မြင်ပါတယ်!</string>
+    <string name="next_question">နောက်တစ်ခွန်း</string>
+    <string name="finish_quiz">ပြီးဆုံးပါပြီ</string>
+    <string name="quiz_complete">✨ ဂုဏ်ယူပါသည်! အောင်မြင်ပါပြီ</string>
     <string name="score_label">ရမှတ်</string>
 
-    <!-- Pro Tutor -->
     <string name="tutor_title">🎓 Pro Tutor</string>
     <string name="tutor_empty_title">Pro AI Tutor</string>
-    <string name="tutor_empty_subtitle">မြန်မာ သို့မဟုတ် ရုရှားဘာသာဖြင့် မေးမြန်းပါ</string>
-    <string name="input_hint_myanmar">မြန်မာဘာသာဖြင့် ရေးပါ...</string>
+    <string name="tutor_empty_subtitle">မြန်မာ သို့မဟုတ် ရုရှားဘာသာဖြင့် မေးမြန်းဆွေးနွေးနိုင်ပါသည်</string>
+    <string name="input_hint_myanmar">မြန်မာဘာသာဖြင့် ရေးသားပါ...</string>
     <string name="input_hint_russian">Напишите по-русски...</string>
-    <string name="settings_title">Settings</string>
+    <string name="settings_title">ဆက်တင်များ</string>
     <string name="backend_url_label">Backend URL</string>
-    <string name="done_btn">Done</string>
+    <string name="done_btn">ပြီးပါပြီ</string>
     <string name="lang_myanmar">မြန်မာ</string>
     <string name="lang_russian">ရုရှား</string>
     <string name="mode_conversation">စကားပြော</string>
     <string name="mode_pronunciation">အသံထွက်</string>
-    <string name="mode_grammar">သုံးစွဲမှု</string>
-    <string name="mode_vocabulary">စကားလုံး</string>
+    <string name="mode_grammar">သဒ္ဒါလေ့လာမှု</string>
+    <string name="mode_vocabulary">ဝေါဟာရ</string>
 
-    <!-- Progress -->
     <string name="progress_title">📊 Progress</string>
-    <string name="overall_progress">စုစုပေါင်း တိုးတက်မှု</string>
-    <string name="category_progress">အမျိုးအစားအလိုက်</string>
-    <string name="words_unit">စကားလုံး</string>
-    <string name="quiz_avg_label">Quiz ပျမ်းမျှ</string>
-    <string name="words_label">သင်ယူပြီး</string>
-    <string name="success_label">အောင်မြင်မှု</string>
+    <string name="overall_progress">စုစုပေါင်း တိုးတက်မှုအခြေအနေ</string>
+    <string name="category_progress">ကဏ္ဍအလိုက် တိုးတက်မှု</string>
+    <string name="words_unit">လုံး</string>
+    <string name="quiz_avg_label">Quiz ပျမ်းမျှရမှတ်</string>
+    <string name="words_label">လေ့လာပြီး</string>
+    <string name="success_label">အောင်မြင်မှုနှုန်း</string>
 </resources>

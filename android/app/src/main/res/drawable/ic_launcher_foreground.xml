@@ -4,18 +4,12 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <!-- Book/Language learning icon -->
+    
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M18,82V26c0,-2.21 1.79,-4 4,-4h44c2.21,0 4,1.79 4,4v56c0,2.21 -1.79,4 -4,4H22C19.79,86 18,84.21 18,82zM22,26v56h44V26H22z" />
+        android:pathData="M54,82c12,-8 28,-8 40,-6V28c-12,-2 -28,-2 -40,6 -12,-8 -28,-8 -40,-6v48C26,74 42,74 54,82z" />
+        
     <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M28,38h32v4H28zM28,48h32v4H28zM28,58h20v4H28z" />
-    <!-- Myanmar character hint -->
-    <path
-        android:fillColor="#FFCC00"
-        android:pathData="M74,44c0,-6.63 5.37,-12 12,-12s12,5.37 12,12 -5.37,12 -12,12S74,50.63 74,44z" />
-    <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M80,44c0,-3.31 2.69,-6 6,-6s6,2.69 6,6 -2.69,6 -6,6S80,47.31 80,44z" />
+        android:fillColor="#007AFF"
+        android:pathData="M48,26h6v32l-3,-3 -3,3V26z" />
 </vector>

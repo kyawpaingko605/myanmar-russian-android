@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:layout_marginBottom="12dp">
+    android:paddingHorizontal="16dp"
+    android:layout_marginBottom="10dp">
 
-    <!-- User message (right aligned) -->
     <LinearLayout
         android:id="@+id/user_message_container"
         android:layout_width="match_parent"
@@ -15,19 +16,27 @@
         android:gravity="end"
         android:visibility="gone">
 
-        <TextView
-            android:id="@+id/tv_user_message"
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:maxWidth="280dp"
-            android:text="User message"
-            android:textColor="@color/text_white"
-            android:textSize="14sp"
-            android:background="@drawable/bg_user_bubble"
-            android:padding="12dp" />
+            app:cardBackgroundColor="@color/primary"
+            app:cardCornerRadius="18dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="0dp"
+            android:maxWidth="260dp">
+
+            <TextView
+                android:id="@+id/tv_user_message"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="User message"
+                android:textColor="@color/text_white"
+                android:textSize="15sp"
+                android:paddingHorizontal="14dp"
+                android:paddingVertical="10dp" />
+        </com.google.android.material.card.MaterialCardView>
     </LinearLayout>
 
-    <!-- Assistant message (left aligned) -->
     <LinearLayout
         android:id="@+id/assistant_message_container"
         android:layout_width="match_parent"
@@ -40,38 +49,54 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="🎓"
-            android:textSize="20sp"
+            android:textSize="18sp"
             android:layout_marginEnd="8dp"
-            android:layout_marginTop="4dp" />
+            android:layout_gravity="bottom"
+            android:layout_marginBottom="4dp" />
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:gravity="start">
 
-            <TextView
-                android:id="@+id/tv_assistant_message"
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:maxWidth="280dp"
-                android:text="Assistant message"
-                android:textColor="@color/text_primary"
-                android:textSize="14sp"
-                android:background="@drawable/bg_assistant_bubble"
-                android:padding="12dp" />
+                app:cardBackgroundColor="#E5E5EA"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="0dp"
+                android:maxWidth="260dp">
 
-            <Button
+                <TextView
+                    android:id="@+id/tv_assistant_message"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Assistant message"
+                    android:textColor="@color/text_primary"
+                    android:textSize="15sp"
+                    android:paddingHorizontal="14dp"
+                    android:paddingVertical="10dp" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_play_audio"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="🔊 ကြားကြည့်"
+                android:text="အသံနားထောင်မည်"
+                app:icon="@android:drawable/ic_btn_speak_now"
+                app:iconSize="14dp"
+                app:iconTint="@color/accent_blue"
                 android:textColor="@color/accent_blue"
                 android:textSize="12sp"
                 android:textStyle="bold"
-                android:background="?attr/selectableItemBackground"
-                android:paddingHorizontal="0dp"
-                android:paddingVertical="4dp"
-                android:layout_marginTop="4dp" />
+                android:paddingStart="4dp"
+                android:paddingEnd="8dp"
+                android:layout_marginTop="2dp"
+                android:minHeight="0dp"
+                android:minWidth="0dp" />
         </LinearLayout>
     </LinearLayout>
 

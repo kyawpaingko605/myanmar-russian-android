@@ -7,26 +7,56 @@
     <fragment
         android:id="@+id/nav_home"
         android:name="com.myanmarrussian.ui.HomeFragment"
-        android:label="Home" />
+        android:label="Home">
+        <action
+            android:id="@+id/action_global_to_home"
+            app:destination="@id/nav_home"
+            app:enterAnim="@android:anim/fade_in"
+            app:exitAnim="@android:anim/fade_out" />
+    </fragment>
 
     <fragment
         android:id="@+id/nav_flashcards"
         android:name="com.myanmarrussian.ui.FlashcardsFragment"
-        android:label="Flashcards" />
+        android:label="Flashcards">
+        <action
+            android:id="@+id/action_global_to_flashcards"
+            app:destination="@id/nav_flashcards"
+            app:enterAnim="@android:anim/slide_in_left"
+            app:exitAnim="@android:anim/slide_out_right" />
+    </fragment>
 
     <fragment
         android:id="@+id/nav_quiz"
         android:name="com.myanmarrussian.ui.QuizFragment"
-        android:label="Quiz" />
+        android:label="Quiz">
+        <action
+            android:id="@+id/action_global_to_quiz"
+            app:destination="@id/nav_quiz"
+            app:enterAnim="@android:anim/slide_in_left"
+            app:exitAnim="@android:anim/slide_out_right" />
+    </fragment>
 
     <fragment
         android:id="@+id/nav_tutor"
         android:name="com.myanmarrussian.ui.ProTutorFragment"
-        android:label="Pro Tutor" />
+        android:label="Pro Tutor">
+        <action
+            android:id="@+id/action_global_to_tutor"
+            app:destination="@id/nav_tutor"
+            app:enterAnim="@android:anim/slide_in_left"
+            app:exitAnim="@android:anim/slide_out_right" />
+    </fragment>
 
     <fragment
         android:id="@+id/nav_progress"
         android:name="com.myanmarrussian.ui.ProgressFragment"
-        android:label="Progress" />
+        android:label="Progress">
+        <action
+            android:id="@+id/action_global_to_progress"
+            app:destination="@id/nav_progress"
+            app:enterAnim="@android:anim/slide_in_left"
+            app:exitAnim="@android:anim/slide_out_right" />
+    </fragment>
 
 </navigation>

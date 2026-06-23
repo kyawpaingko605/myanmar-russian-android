@@ -1,106 +1,79 @@
-import express from 'express';
-import cors from 'cors';
-import dotenv from 'dotenv';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+package com.myanmarrussian.api
 
-dotenv.config();
+import com.google.gson.annotations.SerializedName
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
+import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.http.Body
+import retrofit2.http.GET
+import retrofit2.http.POST
+import java.util.concurrent.TimeUnit
 
-const app = express();
-const PORT = process.env.PORT || 3000;
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+/**
+ * Request/Response data classes - matching iOS API contract
+ */
+data class TutorRequest(
+    @SerializedName("message") val message: String,
+    @SerializedName("mode") val mode: String,
+    @SerializedName("langMode") val langMode: String,
+    @SerializedName("history") val history: List<HistoryItem>
+)
 
-if (!GEMINI_API_KEY) {
-  console.error('ERROR: GEMINI_API_KEY environment variable not set');
-  process.exit(1);
+data class HistoryItem(
+    @SerializedName("role") val role: String,
+    @SerializedName("text") val text: String
+)
+
+data class TutorResponse(
+    @SerializedName("success") val success: Boolean,
+    @SerializedName("response") val response: String?,
+    @SerializedName("timestamp") val timestamp: String?,
+    @SerializedName("error") val error: String?
+)
+
+data class HealthResponse(
+    @SerializedName("status") val status: String,
+    @SerializedName("timestamp") val timestamp: String
+)
+
+/**
+ * Retrofit API interface
+ */
+interface TutorApi {
+    @POST("api/tutor")
+    suspend fun sendMessage(@Body request: TutorRequest): Response<TutorResponse>
+
+    @GET("api/health")
+    suspend fun checkHealth(): Response<HealthResponse>
 }
 
-const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
+/**
+ * API Service factory - creates Retrofit instance with given base URL
+ */
+object TutorApiService {
 
-app.use(cors());
-app.use(express.json());
+    fun create(baseUrl: String): TutorApi {
+        val loggingInterceptor = HttpLoggingInterceptor().apply {
+            level = HttpLoggingInterceptor.Level.BODY
+        }
 
-// 💡 Android App ရဲ့ @GET("api/health") နှင့် ကွက်တိ ကိုက်ညီအောင် ပြင်ဆင်ထားပါသည်
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
-});
+        val client = OkHttpClient.Builder()
+            .addInterceptor(loggingInterceptor)
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(60, TimeUnit.SECONDS)
+            .writeTimeout(30, TimeUnit.SECONDS)
+            .build()
 
-// 💡 Android App ရဲ့ @POST("api/tutor") နှင့် ကွက်တိ ကိုက်ညီအောင် ပြင်ဆင်ထားပါသည်
-app.post('/api/tutor', async (req, res) => {
-  try {
-    const { message, mode = 'conversation', langMode = 'myanmar', history } = req.body;
+        // Ensure base URL ends with /
+        val normalizedUrl = if (baseUrl.endsWith("/")) baseUrl else "$baseUrl/"
 
-    if (!message) {
-      return res.status(400).json({ error: 'Message is required' });
+        return Retrofit.Builder()
+            .baseUrl(normalizedUrl)
+            .client(client)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(TutorApi::class.java)
     }
-
-    const systemPrompt = getSystemPrompt(mode, langMode);
-
-    const model = genAI.getGenerativeModel({ 
-      model: 'gemini-1.5-flash',
-      systemInstruction: systemPrompt
-    });
-
-    // History ပုံစံကို Gemini SDK Version အသစ်အတိုင်း စနစ်တကျ ပြောင်းလဲခြင်း
-    let formattedHistory = [];
-    if (history && Array.isArray(history)) {
-      formattedHistory = history
-        .filter(msg => msg && (msg.text || msg.content))
-        .map(msg => ({
-          role: msg.role === 'user' ? 'user' : 'model',
-          parts: [{ text: msg.text || msg.content }],
-        }));
-    }
-
-    const chat = model.startChat({
-      history: formattedHistory,
-      generationConfig: {
-        temperature: 0.8,
-        maxOutputTokens: 1024,
-      },
-    });
-
-    const result = await chat.sendMessage(message);
-    const responseText = result.response.text();
-
-    // Android App ရဲ့ TutorResponse Data Class ပုံစံအတိုင်း ကွက်တိ ပြန်ပေးခြင်း
-    res.json({
-      success: true,
-      response: responseText,
-      timestamp: new Date().toISOString(),
-      error: null
-    });
-  } catch (error) {
-    console.error('Tutor API error:', error);
-    res.status(500).json({
-      success: false,
-      response: null,
-      timestamp: new Date().toISOString(),
-      error: error.message || 'Internal server error'
-    });
-  }
-});
-
-// Vocabulary endpoint
-app.get('/api/vocabulary', (req, res) => {
-  const vocabulary = [
-    { id: 'g1', category: 'greetings', myanmar: 'မင်္ဂလာပါ', russian: 'Привет', pronunciation: 'Privet' },
-    { id: 'g2', category: 'greetings', myanmar: 'ကောင်းပါတယ်', russian: 'Спасибо', pronunciation: 'Spasibo' },
-    { id: 'g3', category: 'greetings', myanmar: 'ကျေးဇူးတင်ပါတယ်', russian: 'Пожалуйста', pronunciation: 'Pozhaluysta' },
-  ];
-  res.json({ success: true, vocabulary, count: vocabulary.length });
-});
-
-// Error handling middleware
-app.use((err, req, res, next) => {
-  console.error('Error:', err);
-  res.status(500).json({ success: false, error: 'Internal server error' });
-});
-
-function getSystemPrompt(mode, langMode) {
-  const baseContext = 'You are an expert Russian language tutor helping Myanmar speakers learn conversational Russian.';
-  return `${baseContext}\n\nCRITICAL RULES:\n1. Always respond in BOTH Myanmar and Russian\n2. Include pronunciation guides in Latin characters.`;
 }
-
-app.listen(PORT, () => {
-  console.log(`🚀 Backend server running on http://localhost:${PORT}`);
-});

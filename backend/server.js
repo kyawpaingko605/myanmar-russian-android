@@ -35,18 +35,18 @@ app.post('/api/tutor', async (req, res) => {
 
     const systemPrompt = getSystemPrompt(mode, langMode);
 
-    // ပိုမိုသဟဇာတဖြစ်ပြီး အလုပ်လုပ်သေချာသော gemini-1.5-flash ကို သုံးထားပါသည်
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    // v1 API ဗားရှင်းအားလုံးနှင့် သေချာပေါက်အလုပ်လုပ်မည့် 'gemini-pro' ကို ပြန်ပြောင်းထားပါသည်
+    const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
 
-    // Package Version အားလုံးနှင့် အဆင်ပြေစေရန် စည်းကမ်းချက်ကို Contents ထဲတွင် တိုက်ရိုက်ထည့်သွင်းခြင်း
+    // ဗားရှင်းဟောင်း SDK များအတွက် စည်းကမ်းချက် (System Prompt) ကို စကားပြောခန်းအစ၌ ထည့်သွင်းခြင်း
     const formattedHistory = [
       {
         role: 'user',
-        parts: [{ text: systemPrompt + "\n\nUnderstood? Acknowledge this and wait for my message." }]
+        parts: [{ text: systemPrompt + "\n\nUnderstood? Acknowledge these rules and wait for my message." }]
       },
       {
         role: 'model',
-        parts: [{ text: "I understand the rules. I am your expert Russian tutor. Let's begin!" }]
+        parts: [{ text: "I understand perfectly. I am your expert Russian language tutor for Myanmar speakers. Let's begin!" }]
       },
       ...history.map(msg => ({
         role: msg.role === 'user' ? 'user' : 'model',

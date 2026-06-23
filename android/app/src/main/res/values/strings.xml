@@ -56,4 +56,6 @@
     <string name="category_progress">အမျိုးအစားအလိုက်</string>
     <string name="words_unit">စကားလုံး</string>
     <string name="quiz_avg_label">Quiz ပျမ်းမျှ</string>
+    <string name="words_label">သင်ယူပြီး</string>
+    <string name="success_label">အောင်မြင်မှု</string>
 </resources>

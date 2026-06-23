@@ -6,16 +6,19 @@
     android:orientation="vertical"
     android:background="@color/background">
 
-    <!-- Header -->
+    <!-- Header (Green background matching iOS) -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:background="#1AB380"
-        android:padding="20dp">
+        android:background="@drawable/gradient_progress_header"
+        android:orientation="vertical"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp">
 
         <TextView
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/progress_title"
             android:textColor="@color/text_white"
@@ -23,6 +26,7 @@
             android:textStyle="bold" />
     </LinearLayout>
 
+    <!-- Content -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -31,14 +35,18 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="20dp">
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:paddingTop="16dp"
+            android:paddingBottom="20dp">
 
             <!-- Stats Row -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginBottom="16dp">
+                android:layout_marginBottom="16dp"
+                android:spacing="12dp">
 
                 <!-- Streak Card -->
                 <LinearLayout
@@ -49,7 +57,10 @@
                     android:background="@drawable/bg_card_rounded"
                     android:gravity="center"
                     android:orientation="vertical"
-                    android:padding="12dp">
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp"
+                    android:paddingTop="12dp"
+                    android:paddingBottom="12dp">
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -61,7 +72,8 @@
                         android:text="5"
                         android:textColor="@color/text_primary"
                         android:textSize="20sp"
-                        android:textStyle="bold" />
+                        android:textStyle="bold"
+                        android:layout_marginTop="8dp" />
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -69,8 +81,7 @@
                         android:textColor="@color/text_secondary"
                         android:textSize="11sp"
                         android:textStyle="bold"
-                        android:maxLines="1"
-                        android:ellipsize="end" />
+                        android:layout_marginTop="4dp" />
                 </LinearLayout>
 
                 <!-- Words Learned Card -->
@@ -83,7 +94,10 @@
                     android:background="@drawable/bg_card_rounded"
                     android:gravity="center"
                     android:orientation="vertical"
-                    android:padding="12dp">
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp"
+                    android:paddingTop="12dp"
+                    android:paddingBottom="12dp">
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -95,19 +109,19 @@
                         android:text="45"
                         android:textColor="@color/text_primary"
                         android:textSize="20sp"
-                        android:textStyle="bold" />
+                        android:textStyle="bold"
+                        android:layout_marginTop="8dp" />
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/words_learned_label"
+                        android:text="@string/words_label"
                         android:textColor="@color/text_secondary"
                         android:textSize="11sp"
                         android:textStyle="bold"
-                        android:maxLines="1"
-                        android:ellipsize="end" />
+                        android:layout_marginTop="4dp" />
                 </LinearLayout>
 
-                <!-- Quiz Avg Card -->
+                <!-- Quiz Average Card -->
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -116,7 +130,10 @@
                     android:background="@drawable/bg_card_rounded"
                     android:gravity="center"
                     android:orientation="vertical"
-                    android:padding="12dp">
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp"
+                    android:paddingTop="12dp"
+                    android:paddingBottom="12dp">
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -128,7 +145,8 @@
                         android:text="85%"
                         android:textColor="@color/text_primary"
                         android:textSize="20sp"
-                        android:textStyle="bold" />
+                        android:textStyle="bold"
+                        android:layout_marginTop="8dp" />
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -136,24 +154,28 @@
                         android:textColor="@color/text_secondary"
                         android:textSize="11sp"
                         android:textStyle="bold"
-                        android:maxLines="1"
-                        android:ellipsize="end" />
+                        android:layout_marginTop="4dp" />
                 </LinearLayout>
+
             </LinearLayout>
 
             <!-- Overall Progress Card -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
+                android:layout_marginBottom="16dp"
                 android:background="@drawable/bg_card_rounded"
-                android:padding="16dp"
-                android:layout_marginBottom="16dp">
+                android:orientation="vertical"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:paddingTop="16dp"
+                android:paddingBottom="16dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
+                    android:gravity="center_vertical"
                     android:layout_marginBottom="8dp">
 
                     <TextView
@@ -166,21 +188,23 @@
                         android:textStyle="bold" />
 
                     <TextView
+                        android:id="@+id/tv_progress_percentage"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="45%"
-                        android:textColor="#1AB380"
+                        android:textColor="@color/accent_green"
                         android:textSize="14sp"
                         android:textStyle="bold" />
                 </LinearLayout>
 
                 <ProgressBar
+                    android:id="@+id/progress_overall"
+                    style="?android:attr/progressBarStyleHorizontal"
                     android:layout_width="match_parent"
                     android:layout_height="8dp"
-                    style="?android:attr/progressBarStyleHorizontal"
-                    android:progressTint="#1AB380"
                     android:progress="45"
                     android:max="100"
+                    android:progressTint="@color/accent_green"
                     android:layout_marginBottom="8dp" />
 
                 <TextView
@@ -193,7 +217,7 @@
 
             <!-- Category Progress Title -->
             <TextView
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/category_progress"
                 android:textColor="@color/text_primary"
@@ -201,35 +225,37 @@
                 android:textStyle="bold"
                 android:layout_marginBottom="12dp" />
 
-            <!-- Greetings Category -->
+            <!-- Category 1: Greetings -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:background="@drawable/bg_card_rounded"
                 android:orientation="vertical"
-                android:layout_marginBottom="12dp">
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:paddingTop="12dp"
+                android:paddingBottom="12dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
-                    android:layout_marginBottom="4dp">
+                    android:layout_marginBottom="8dp">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="👋"
-                        android:textSize="18sp"
-                        android:layout_marginEnd="8dp" />
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Greetings"
+                        android:text="👋 Greetings"
                         android:textColor="@color/text_primary"
                         android:textSize="14sp"
                         android:textStyle="bold" />
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -240,43 +266,45 @@
                 </LinearLayout>
 
                 <ProgressBar
+                    style="?android:attr/progressBarStyleHorizontal"
                     android:layout_width="match_parent"
                     android:layout_height="6dp"
-                    style="?android:attr/progressBarStyleHorizontal"
-                    android:progressTint="@color/primary"
                     android:progress="80"
-                    android:max="100" />
+                    android:max="100"
+                    android:progressTint="#CC3333" />
             </LinearLayout>
 
-            <!-- Numbers Category -->
+            <!-- Category 2: Numbers -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:background="@drawable/bg_card_rounded"
                 android:orientation="vertical"
-                android:layout_marginBottom="12dp">
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:paddingTop="12dp"
+                android:paddingBottom="12dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
-                    android:layout_marginBottom="4dp">
+                    android:layout_marginBottom="8dp">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="🔢"
-                        android:textSize="18sp"
-                        android:layout_marginEnd="8dp" />
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Numbers"
+                        android:text="🔢 Numbers"
                         android:textColor="@color/text_primary"
                         android:textSize="14sp"
                         android:textStyle="bold" />
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -287,43 +315,45 @@
                 </LinearLayout>
 
                 <ProgressBar
+                    style="?android:attr/progressBarStyleHorizontal"
                     android:layout_width="match_parent"
                     android:layout_height="6dp"
-                    style="?android:attr/progressBarStyleHorizontal"
-                    android:progressTint="@color/accent_blue"
                     android:progress="100"
-                    android:max="100" />
+                    android:max="100"
+                    android:progressTint="#3399FF" />
             </LinearLayout>
 
-            <!-- Food Category -->
+            <!-- Category 3: Food -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:background="@drawable/bg_card_rounded"
                 android:orientation="vertical"
-                android:layout_marginBottom="12dp">
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:paddingTop="12dp"
+                android:paddingBottom="12dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
-                    android:layout_marginBottom="4dp">
+                    android:layout_marginBottom="8dp">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="🍽️"
-                        android:textSize="18sp"
-                        android:layout_marginEnd="8dp" />
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Food"
+                        android:text="🍽️ Food"
                         android:textColor="@color/text_primary"
                         android:textSize="14sp"
                         android:textStyle="bold" />
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -334,43 +364,44 @@
                 </LinearLayout>
 
                 <ProgressBar
+                    style="?android:attr/progressBarStyleHorizontal"
                     android:layout_width="match_parent"
                     android:layout_height="6dp"
-                    style="?android:attr/progressBarStyleHorizontal"
-                    android:progressTint="#1AB380"
                     android:progress="50"
-                    android:max="100" />
+                    android:max="100"
+                    android:progressTint="#33BB55" />
             </LinearLayout>
 
-            <!-- Places Category -->
+            <!-- Category 4: Places -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="@drawable/bg_card_rounded"
                 android:orientation="vertical"
-                android:layout_marginBottom="12dp">
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:paddingTop="12dp"
+                android:paddingBottom="12dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
-                    android:layout_marginBottom="4dp">
+                    android:layout_marginBottom="8dp">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="🏠"
-                        android:textSize="18sp"
-                        android:layout_marginEnd="8dp" />
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Places"
+                        android:text="🏠 Places"
                         android:textColor="@color/text_primary"
                         android:textSize="14sp"
                         android:textStyle="bold" />
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -381,12 +412,12 @@
                 </LinearLayout>
 
                 <ProgressBar
+                    style="?android:attr/progressBarStyleHorizontal"
                     android:layout_width="match_parent"
                     android:layout_height="6dp"
-                    style="?android:attr/progressBarStyleHorizontal"
-                    android:progressTint="@color/accent_orange"
                     android:progress="62"
-                    android:max="100" />
+                    android:max="100"
+                    android:progressTint="#FF9933" />
             </LinearLayout>
 
         </LinearLayout>

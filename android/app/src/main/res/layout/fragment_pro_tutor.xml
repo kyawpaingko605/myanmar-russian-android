@@ -6,14 +6,18 @@
     android:orientation="vertical"
     android:background="@color/background">
 
-    <!-- Header -->
+    <!-- Header (Gray background matching iOS) -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:background="@color/card_background"
-        android:padding="16dp">
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp">
 
+        <!-- Title + Settings Button -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -37,28 +41,32 @@
                 android:src="@drawable/ic_settings"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:tint="@color/accent_blue"
-                android:contentDescription="Settings" />
+                android:contentDescription="Settings"
+                android:scaleType="centerInside" />
         </LinearLayout>
 
-        <!-- Language Mode Toggles -->
+        <!-- Language Mode Toggles (Myanmar / Russian) -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginBottom="8dp">
+            android:layout_marginBottom="12dp"
+            android:spacing="8dp">
 
             <Button
                 android:id="@+id/btn_lang_myanmar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
                 android:text="@string/lang_myanmar"
                 android:textSize="12sp"
                 android:textStyle="bold"
-                android:background="@drawable/bg_mode_selected"
                 android:textColor="@color/text_white"
-                android:paddingHorizontal="12dp"
-                android:paddingVertical="6dp" />
+                android:background="@drawable/bg_mode_selected"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:paddingTop="6dp"
+                android:paddingBottom="6dp"
+                android:layout_marginEnd="8dp" />
 
             <Button
                 android:id="@+id/btn_lang_russian"
@@ -67,13 +75,15 @@
                 android:text="@string/lang_russian"
                 android:textSize="12sp"
                 android:textStyle="bold"
-                android:background="@drawable/bg_mode_unselected"
                 android:textColor="@color/text_primary"
-                android:paddingHorizontal="12dp"
-                android:paddingVertical="6dp" />
+                android:background="@drawable/bg_mode_unselected"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:paddingTop="6dp"
+                android:paddingBottom="6dp" />
         </LinearLayout>
 
-        <!-- Tutor Mode Scroll -->
+        <!-- Tutor Mode Scroll (Conversation / Pronunciation / Grammar / Vocabulary) -->
         <HorizontalScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -82,46 +92,53 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:spacing="8dp">
 
                 <Button
                     android:id="@+id/btn_mode_conversation"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
                     android:text="@string/mode_conversation"
                     android:textSize="12sp"
                     android:textStyle="bold"
-                    android:background="@drawable/bg_tutor_mode_selected"
                     android:textColor="@color/text_white"
-                    android:paddingHorizontal="12dp"
-                    android:paddingVertical="6dp" />
+                    android:background="@drawable/bg_tutor_mode_selected"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp"
+                    android:paddingTop="6dp"
+                    android:paddingBottom="6dp"
+                    android:layout_marginEnd="8dp" />
 
                 <Button
                     android:id="@+id/btn_mode_pronunciation"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
                     android:text="@string/mode_pronunciation"
                     android:textSize="12sp"
                     android:textStyle="bold"
-                    android:background="@drawable/bg_mode_unselected"
                     android:textColor="@color/text_primary"
-                    android:paddingHorizontal="12dp"
-                    android:paddingVertical="6dp" />
+                    android:background="@drawable/bg_mode_unselected"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp"
+                    android:paddingTop="6dp"
+                    android:paddingBottom="6dp"
+                    android:layout_marginEnd="8dp" />
 
                 <Button
                     android:id="@+id/btn_mode_grammar"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
                     android:text="@string/mode_grammar"
                     android:textSize="12sp"
                     android:textStyle="bold"
-                    android:background="@drawable/bg_mode_unselected"
                     android:textColor="@color/text_primary"
-                    android:paddingHorizontal="12dp"
-                    android:paddingVertical="6dp" />
+                    android:background="@drawable/bg_mode_unselected"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp"
+                    android:paddingTop="6dp"
+                    android:paddingBottom="6dp"
+                    android:layout_marginEnd="8dp" />
 
                 <Button
                     android:id="@+id/btn_mode_vocabulary"
@@ -130,10 +147,12 @@
                     android:text="@string/mode_vocabulary"
                     android:textSize="12sp"
                     android:textStyle="bold"
-                    android:background="@drawable/bg_mode_unselected"
                     android:textColor="@color/text_primary"
-                    android:paddingHorizontal="12dp"
-                    android:paddingVertical="6dp" />
+                    android:background="@drawable/bg_mode_unselected"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp"
+                    android:paddingTop="6dp"
+                    android:paddingBottom="6dp" />
             </LinearLayout>
         </HorizontalScrollView>
     </LinearLayout>
@@ -144,8 +163,12 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:padding="16dp"
-        android:clipToPadding="false" />
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp"
+        android:clipToPadding="false"
+        android:visibility="gone" />
 
     <!-- Empty State -->
     <LinearLayout
@@ -155,14 +178,15 @@
         android:layout_weight="1"
         android:orientation="vertical"
         android:gravity="center"
-        android:padding="32dp"
-        android:visibility="gone">
+        android:paddingStart="32dp"
+        android:paddingEnd="32dp">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="🎓"
-            android:textSize="48sp" />
+            android:textSize="48sp"
+            android:layout_marginBottom="16dp" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -171,7 +195,7 @@
             android:textColor="@color/text_primary"
             android:textSize="18sp"
             android:textStyle="bold"
-            android:layout_marginTop="16dp" />
+            android:layout_marginBottom="8dp" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -180,17 +204,21 @@
             android:textColor="@color/text_secondary"
             android:textSize="14sp"
             android:gravity="center"
-            android:layout_marginTop="8dp" />
+            android:layout_marginBottom="16dp" />
     </LinearLayout>
 
-    <!-- Input Area -->
+    <!-- Input Area (Gray background) -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:background="@color/card_background"
-        android:padding="16dp"
-        android:gravity="center_vertical">
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp"
+        android:gravity="center_vertical"
+        android:spacing="12dp">
 
         <EditText
             android:id="@+id/et_message_input"
@@ -200,19 +228,22 @@
             android:hint="@string/input_hint_myanmar"
             android:textSize="14sp"
             android:background="@drawable/bg_input_field"
-            android:padding="12dp"
-            android:maxLines="3"
-            android:inputType="textMultiLine" />
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:paddingTop="12dp"
+            android:paddingBottom="12dp"
+            android:inputType="text"
+            android:maxLines="3" />
 
         <ImageButton
             android:id="@+id/btn_send"
-            android:layout_width="44dp"
-            android:layout_height="44dp"
-            android:layout_marginStart="12dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:src="@drawable/ic_send"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:tint="@color/accent_blue"
-            android:contentDescription="Send" />
+            android:contentDescription="Send message"
+            android:scaleType="centerInside" />
     </LinearLayout>
 
 </LinearLayout>

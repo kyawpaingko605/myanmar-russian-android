@@ -7,14 +7,7 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-
-if (!GEMINI_API_KEY) {
-  console.error('ERROR: GEMINI_API_KEY environment variable not set');
-  process.exit(1);
-}
-
-const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
+const DEFAULT_GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
 app.use(cors());
 app.use(express.json());
@@ -33,6 +26,14 @@ app.post('/api/tutor', async (req, res) => {
       return res.status(400).json({ error: 'Message is required' });
     }
 
+    // 💡 ကျောင်းသားဆီက Header မှတစ်ဆင့် ကိုယ်ပိုင် API Key ပါလာပါက ၎င်းကို အသုံးပြုမည်၊ မပါပါက Server ရဲ့ Free Key ကို သုံးမည်။
+    const activeApiKey = req.headers['x-gemini-api-key'] || DEFAULT_GEMINI_API_KEY;
+
+    if (!activeApiKey) {
+      return res.status(500).json({ success: false, error: 'Gemini API Key မရှိပါသဖြင့် လုပ်ဆောင်၍မရပါ' });
+    }
+
+    const genAI = new GoogleGenerativeAI(activeApiKey);
     const systemPrompt = getSystemPrompt(mode, langMode);
 
     const model = genAI.getGenerativeModel({ 
@@ -73,8 +74,16 @@ app.post('/api/tutor', async (req, res) => {
 // Level အလိုက် Dynamic Flashcards ထုတ်ပေးမည့် Vocabulary Endpoint သစ်
 app.get('/api/vocabulary', async (req, res) => {
   try {
-    // Android ဘက်မှ ?level=A1 သို့မဟုတ် A2, B1 ဟု လှမ်းပို့သည်ကို ဖတ်ခြင်း
     const { level = 'A1' } = req.query;
+
+    // Vocabulary အတွက်လည်း Client Key ကို ဦးစားပေး စစ်ဆေးပေးခြင်း
+    const activeApiKey = req.headers['x-gemini-api-key'] || DEFAULT_GEMINI_API_KEY;
+
+    if (!activeApiKey) {
+      return res.status(500).json({ success: false, error: 'Gemini API Key မရှိပါသဖြင့် လုပ်ဆောင်၍မရပါ' });
+    }
+
+    const genAI = new GoogleGenerativeAI(activeApiKey);
 
     const model = genAI.getGenerativeModel({ 
       model: 'gemini-2.5-flash',
@@ -95,7 +104,6 @@ app.get('/api/vocabulary', async (req, res) => {
     const result = await model.generateContent(prompt);
     let responseText = result.response.text().trim();
 
-    // Markdown Backticks (```json ... ```) ပါလာပါက သန့်စင်ဖယ်ထုတ်ခြင်း
     if (responseText.startsWith('```')) {
       responseText = responseText.replace(/^```json/, '').replace(/^```/, '').trim();
     }

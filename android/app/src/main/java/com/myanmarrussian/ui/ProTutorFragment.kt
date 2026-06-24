@@ -18,6 +18,8 @@ import com.myanmarrussian.adapters.ChatMessageAdapter
 import com.myanmarrussian.api.HistoryItem
 import com.myanmarrussian.api.TutorApiService
 import com.myanmarrussian.api.TutorRequest
+import com.myanmarrussian.database.AppDatabase
+import com.myanmarrussian.database.ChatMessageEntity
 import com.myanmarrussian.databinding.DialogSettingsBinding
 import com.myanmarrussian.databinding.FragmentProTutorBinding
 import com.myanmarrussian.models.ChatMessage
@@ -27,7 +29,8 @@ import kotlinx.coroutines.launch
 
 /**
  * ProTutorFragment - Equivalent to iOS ProTutorView
- * AI-powered chat tutor with language mode, tutor mode selection and user Gemini API key integration
+ * AI-powered chat tutor with language mode, tutor mode selection, user Gemini API key integration
+ * and local persistent storage via Room Database.
  */
 class ProTutorFragment : Fragment() {
 
@@ -40,6 +43,9 @@ class ProTutorFragment : Fragment() {
     private var currentLangMode = LangMode.MYANMAR
     private var currentTutorMode = TutorMode.CONVERSATION
     private var isLoading = false
+    
+    // 💡 Database Object အား ကြိုတင်ကြေညာထားခြင်း
+    private lateinit var database: AppDatabase
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -53,15 +59,18 @@ class ProTutorFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Set up RecyclerView (အသံထွက်လုပ်ဆောင်ချက်ကို ChatMessageAdapter တွင်းသို့ တိုက်ရိုက်လွှဲပြောင်းပေးအပ်ထားပါသည်)
+        // Initialize Database
+        database = AppDatabase.getDatabase(requireContext())
+
+        // Set up RecyclerView
         adapter = ChatMessageAdapter(messages)
         binding.rvMessages.layoutManager = LinearLayoutManager(requireContext()).apply {
             stackFromEnd = true
         }
         binding.rvMessages.adapter = adapter
 
-        // Show empty state initially
-        updateEmptyState()
+        // 💡 မျက်နှာပြင်စဖွင့်လျှင် Room Database ထဲမှ စကားပြောမှတ်တမ်းဟောင်းများကို ဆွဲထုတ်ပြသခြင်း
+        loadChatHistoryFromDatabase()
 
         // Language mode buttons
         binding.btnLangMyanmar.setOnClickListener {
@@ -97,6 +106,24 @@ class ProTutorFragment : Fragment() {
 
         // Update input hint
         updateInputHint()
+    }
+
+    private fun loadChatHistoryFromDatabase() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            try {
+                val savedList = database.chatDao().getAllMessages()
+                messages.clear()
+                savedList.forEach { entity ->
+                    val role = if (entity.role == "user") ChatMessage.MessageRole.USER else ChatMessage.MessageRole.ASSISTANT
+                    messages.add(ChatMessage(role = role, text = entity.text))
+                }
+                adapter.notifyDataSetChanged()
+                updateEmptyState()
+                scrollToBottom()
+            } catch (e: Exception) {
+                Log.e("Database", "Error loading messages: ${e.message}")
+            }
+        }
     }
 
     private fun setLangMode(mode: LangMode) {
@@ -175,11 +202,11 @@ class ProTutorFragment : Fragment() {
         val text = binding.etMessageInput.text.toString().trim()
         if (text.isEmpty() || isLoading) return
 
-        // 💡 ဖုန်းထဲတွင် သိမ်းဆည်းထားသော ကျောင်းသား၏ ကိုယ်ပိုင် Gemini API Key ကို လှမ်းဖတ်ခြင်း
+        // 💡 SharedPreferences ထဲမှ ကျောင်းသား၏ API Key လှမ်းဖတ်ခြင်း
         val sharedPref = requireContext().getSharedPreferences("AppState", Context.MODE_PRIVATE)
         val userApiKey = sharedPref.getString("USER_GEMINI_KEY", null)
 
-        // Add user message
+        // Add user message to UI List
         val userMessage = ChatMessage(role = ChatMessage.MessageRole.USER, text = text)
         messages.add(userMessage)
         adapter.notifyItemInserted(messages.size - 1)
@@ -190,16 +217,15 @@ class ProTutorFragment : Fragment() {
         isLoading = true
         binding.btnSend.isEnabled = false
 
-        // Call backend API
+        // Call backend API & Handle Database Room Storage
         viewLifecycleOwner.lifecycleScope.launch {
             try {
-                val api = TutorApiService.create(AppState.backendUrl)
+                // 💡 User ပို့လိုက်သောစာအား Room Database ထဲသို့ ထည့်သွင်းသိမ်းဆည်းခြင်း
+                database.chatDao().insertMessage(ChatMessageEntity(role = "user", text = text))
 
+                val api = TutorApiService.create(AppState.backendUrl)
                 val history = messages.dropLast(1).map { msg ->
-                    HistoryItem(
-                        role = msg.role.value,
-                        text = msg.text
-                    )
+                    HistoryItem(role = msg.role.value, text = msg.text)
                 }
 
                 val request = TutorRequest(
@@ -209,11 +235,14 @@ class ProTutorFragment : Fragment() {
                     history = history
                 )
 
-                // 💡 Interface ထဲက parameter အစီအစဉ်အတိုင်း တိကျမှန်ကန်စွာ ပေးပို့ခြင်း
                 val response = api.sendMessage(request = request, apiKey = userApiKey)
 
                 if (response.isSuccessful) {
                     val responseText = response.body()?.response ?: "❌ Empty response"
+                    
+                    // 💡 AI ထံမှ ပြန်ရလာသောစာအား Room Database ထဲသို့ ထည့်သွင်းသိမ်းဆည်းခြင်း
+                    database.chatDao().insertMessage(ChatMessageEntity(role = "assistant", text = responseText))
+
                     val assistantMessage = ChatMessage(
                         role = ChatMessage.MessageRole.ASSISTANT,
                         text = responseText
@@ -222,19 +251,15 @@ class ProTutorFragment : Fragment() {
                     adapter.notifyItemInserted(messages.size - 1)
                     scrollToBottom()
                 } else {
-                    val errorMsg = ChatMessage(
-                        role = ChatMessage.MessageRole.ASSISTANT,
-                        text = "❌ Error: ${response.code()} - ${response.message()}"
-                    )
+                    val errorText = "❌ Error: ${response.code()} - ${response.message()}"
+                    val errorMsg = ChatMessage(role = ChatMessage.MessageRole.ASSISTANT, text = errorText)
                     messages.add(errorMsg)
                     adapter.notifyItemInserted(messages.size - 1)
                     scrollToBottom()
                 }
             } catch (e: Exception) {
-                val errorMsg = ChatMessage(
-                    role = ChatMessage.MessageRole.ASSISTANT,
-                    text = "❌ Error: ${e.message ?: "Unknown error"}\n\nBackend URL စစ်ဆေးပါ: ${AppState.backendUrl}"
-                )
+                val errorText = "❌ Error: ${e.message ?: "Unknown error"}\n\nBackend URL စစ်ဆေးပါ: ${AppState.backendUrl}"
+                val errorMsg = ChatMessage(role = ChatMessage.MessageRole.ASSISTANT, text = errorText)
                 messages.add(errorMsg)
                 adapter.notifyItemInserted(messages.size - 1)
                 scrollToBottom()
@@ -258,7 +283,6 @@ class ProTutorFragment : Fragment() {
         val sharedPref = requireContext().getSharedPreferences("AppState", Context.MODE_PRIVATE)
         val savedKey = sharedPref.getString("USER_GEMINI_KEY", "")
         
-        // 💡 R.id.et_gemini_key ကြောင့် Unresolved reference မဖြစ်အောင် Dynamic ID ဖြင့် ရှာဖွေခြင်း
         val mainView = dialogBinding.root
         val resId = resources.getIdentifier("et_gemini_key", "id", requireContext().packageName)
         if (resId != 0) {
@@ -278,7 +302,6 @@ class ProTutorFragment : Fragment() {
                 AppState.backendUrl = url
             }
 
-            // 💡 SharedPreferences ထဲသို့ Key သိမ်းဆည်းခြင်း
             if (resId != 0) {
                 val inputView = mainView.findViewById<View>(resId)
                 if (inputView is EditText) {
@@ -296,7 +319,7 @@ class ProTutorFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        adapter.onDestroy() // Adapter အတွင်းရှိ TTS Resource ကို အလိုအလျောက် ပိတ်သိမ်းခြင်း
+        adapter.onDestroy()
         _binding = null
     }
 }

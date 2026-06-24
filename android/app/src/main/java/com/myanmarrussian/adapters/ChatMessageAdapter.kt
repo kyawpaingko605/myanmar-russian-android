@@ -1,5 +1,7 @@
 package com.myanmarrussian.adapters
 
+import android.content.Intent
+import android.provider.Settings
 import android.speech.tts.TextToSpeech
 import android.view.LayoutInflater
 import android.view.View
@@ -11,7 +13,7 @@ import com.myanmarrussian.models.ChatMessage
 import java.util.Locale
 
 /**
- * ChatMessageAdapter - RecyclerView adapter for chat messages with intelligent bilingual TTS
+ * ChatMessageAdapter - RecyclerView adapter for chat messages with intelligent bilingual TTS and auto-settings redirect
  */
 class ChatMessageAdapter(
     private val messages: MutableList<ChatMessage> = mutableListOf(),
@@ -55,8 +57,6 @@ class ChatMessageAdapter(
             return
         }
 
-        // စာကြောင်းကို စကားလုံးအလိုက် ခွဲထုတ်ပြီး ရုရှားစာ သီးသန့်၊ မြန်မာစာ သီးသန့် ဖတ်ရန်
-        // ပိုမိုရိုးရှင်းပြီး သဘာဝကျစေရန် စာကြောင်းတစ်ခုလုံးတွင် ရုရှားစာလုံး အဓိကပါသလား အရင်စစ်ဆေးခြင်း
         val hasRussian = text.any { it in '\u0400'..'\u04FF' }
 
         if (hasRussian) {
@@ -67,10 +67,23 @@ class ChatMessageAdapter(
         } else {
             // မြန်မာရှင်းလင်းချက် သီးသန့်ဖြစ်ပါက မြန်မာအသံစနစ်သို့ ပြောင်းလဲဖတ်ပေးမည်
             val result = tts?.setLanguage(Locale("my", "MM"))
+            
             if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-                // မြန်မာ Voice Pack မရှိပါက ရုရှားလိုပဲ ဆက်ဖတ်ခိုင်းခြင်း (အင်္ဂလိပ်သံဝဲခြင်းကို ကာကွယ်ရန်)
-                tts?.language = Locale("ru", "RU")
-                tts?.speak(text, TextToSpeech.QUEUE_FLUSH, null, "chat_tts")
+                // 💡 မြန်မာ Voice Pack မရှိပါက ပေါ့ပ်အပ်ပြပြီး ဖုန်းရွှေ့ Settings စာမျက်နှာကို တန်းဖွင့်ပေးခြင်း
+                Toast.makeText(context, "မြန်မာအသံထွက်စနစ် မရှိသေးပါ။ Install voice data တွင် Myanmar (Burmese) ကို ဒေါင်းလုဒ်လုပ်ပေးပါ၊", Toast.LENGTH_LONG).show()
+                
+                try {
+                    val intent = Intent().apply {
+                        action = "com.android.settings.TTS_SETTINGS"
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                    }
+                    context.startActivity(intent)
+                } catch (e: Exception) {
+                    val intent = Intent(Settings.ACTION_SETTINGS).apply {
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                    }
+                    context.startActivity(intent)
+                }
             } else {
                 tts?.setSpeechRate(1.0f)
                 tts?.speak(text, TextToSpeech.QUEUE_FLUSH, null, "chat_tts")
@@ -79,7 +92,6 @@ class ChatMessageAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessageViewHolder {
-        // Initialize TTS inside adapter if not done yet
         if (tts == null) {
             tts = TextToSpeech(parent.context.applicationContext, this)
         }

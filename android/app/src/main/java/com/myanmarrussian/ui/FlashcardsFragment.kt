@@ -9,25 +9,30 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
+import com.myanmarrussian.AppState
 import com.myanmarrussian.databinding.FragmentFlashcardsBinding
-import com.myanmarrussian.models.Card
-import com.myanmarrussian.models.CardData
+import com.myanmarrussian.api.TutorApiService
+import com.myanmarrussian.api.VocabularyItem
+import kotlinx.coroutines.launch
 import java.util.Locale
 
 /**
- * FlashcardsFragment - Equivalent to iOS FlashcardsView
- * Shows flip cards with Myanmar/Russian vocabulary and TTS support
+ * FlashcardsFragment - AI-powered dynamic flashcards by learning levels
+ * Shows flip cards with Myanmar/Russian vocabulary fetched from Gemini AI
  */
 class FlashcardsFragment : Fragment(), TextToSpeech.OnInitListener {
 
     private var _binding: FragmentFlashcardsBinding? = null
     private val binding get() = _binding!!
 
-    private val cards: List<Card> = CardData.defaultCards
+    // AI ဆီမှ ရလာမည့် ကတ်ပြားများကို သိမ်းဆည်းရန် Array
+    private val cards = mutableListOf<VocabularyItem>()
     private var currentIndex = 0
     private var isFlipped = false
     private var tts: TextToSpeech? = null
     private var isTtsReady = false
+    private var currentLevel = "A1"
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -46,7 +51,7 @@ class FlashcardsFragment : Fragment(), TextToSpeech.OnInitListener {
 
         // Set up flip card tap
         binding.flipCardContainer.setOnClickListener {
-            flipCard()
+            if (cards.isNotEmpty()) flipCard()
         }
 
         // Previous button
@@ -69,13 +74,57 @@ class FlashcardsFragment : Fragment(), TextToSpeech.OnInitListener {
 
         // Listen button
         binding.btnListen.setOnClickListener {
-            speakRussian()
+            if (cards.isNotEmpty()) speakRussian()
         }
 
-        updateCard()
+        // Level Selection Buttons - ခလုတ်များ နှိပ်ပါက AI ဆီမှ အသစ်တောင်းမည်
+        binding.btnLevelA1?.setOnClickListener { loadAiVocabulary("A1") }
+        binding.btnLevelA2?.setOnClickListener { loadAiVocabulary("A2") }
+        binding.btnLevelB1?.setOnClickListener { loadAiVocabulary("B1") }
+
+        // စဖွင့်ချင်း Default အနေဖြင့် A1 ဒေတာကို AI ဆီမှ တောင်းယူမည်
+        loadAiVocabulary("A1")
+    }
+
+    private fun loadAiVocabulary(level: String) {
+        currentLevel = level
+        // Loading ပြပေးခြင်း
+        binding.progressBar?.visibility = View.VISIBLE
+        binding.flipCardContainer.visibility = View.INVISIBLE
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            try {
+                val api = TutorApiService.create(AppState.backendUrl)
+                val response = api.getVocabulary(level)
+
+                if (response.isSuccessful && response.body()?.success == true) {
+                    val newCards = response.body()?.vocabulary ?: emptyList()
+                    cards.clear()
+                    cards.addAll(newCards)
+                    currentIndex = 0
+                    isFlipped = false
+                    updateCard()
+                    
+                    binding.flipCardContainer.visibility = View.VISIBLE
+                } else {
+                    Toast.makeText(requireContext(), "❌ ဒေတာဆွဲယူ၍မရပါ Level: $level", Toast.LENGTH_SHORT).show()
+                }
+            } catch (e: Exception) {
+                Toast.makeText(requireContext(), "ချိတ်ဆက်မှု အဆင်မပြေပါ: ${e.message}", Toast.LENGTH_LONG).show()
+            } finally {
+                // Loading ပိတ်ပေးခြင်း
+                binding.progressBar?.visibility = View.GONE
+            }
+        }
     }
 
     private fun updateCard() {
+        if (cards.isEmpty()) {
+            binding.tvCardCounter.text = "0/0"
+            binding.tvMyanmarWord.text = "စာလုံးမရှိပါ"
+            return
+        }
+
         val card = cards[currentIndex]
 
         // Update counter
@@ -102,7 +151,6 @@ class FlashcardsFragment : Fragment(), TextToSpeech.OnInitListener {
         isFlipped = !isFlipped
 
         if (isFlipped) {
-            // Show back (Russian) side with animation
             binding.flipCardContainer.animate()
                 .rotationY(90f)
                 .setDuration(150)
@@ -117,7 +165,6 @@ class FlashcardsFragment : Fragment(), TextToSpeech.OnInitListener {
                 }
                 .start()
         } else {
-            // Show front (Myanmar) side with animation
             binding.flipCardContainer.animate()
                 .rotationY(90f)
                 .setDuration(150)

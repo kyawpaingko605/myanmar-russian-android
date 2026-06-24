@@ -63,7 +63,7 @@ interface TutorApi {
     @POST("api/tutor")
     suspend fun sendMessage(
         @Body request: TutorRequest,
-        @Header("x-gemini-api-key") apiKey: String? // 💡 Named argument ပိုမိုအဆင်ပြေစေရန် နောက်သို့ ရွှေ့ထားပါသည်
+        @Header("x-gemini-api-key") apiKey: String? = null // 💡 Default = null ထည့်သွင်း၍ Build Error ကို ကျော်လွှားခြင်း
     ): Response<TutorResponse>
 
     @GET("api/health")
@@ -73,7 +73,7 @@ interface TutorApi {
     @GET("api/vocabulary")
     suspend fun getVocabulary(
         @Query("level") level: String,
-        @Header("x-gemini-api-key") apiKey: String? // 💡 Flashcards တောင်းရာတွင်လည်း အဆင်ပြေအောင် နောက်ဆုံးတွင် ထားရှိပါသည်
+        @Header("x-gemini-api-key") apiKey: String? = null // 💡 Default = null ထည့်သွင်းထားသောကြောင့် parameter မပါလည်း Build အောင်မြင်ပါမည်
     ): Response<VocabularyResponse>
 }
 

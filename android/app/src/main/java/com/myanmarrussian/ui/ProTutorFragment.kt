@@ -1,11 +1,13 @@
 package com.myanmarrussian.ui
 
 import android.app.AlertDialog
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -25,7 +27,7 @@ import kotlinx.coroutines.launch
 
 /**
  * ProTutorFragment - Equivalent to iOS ProTutorView
- * AI-powered chat tutor with language mode and tutor mode selection
+ * AI-powered chat tutor with language mode, tutor mode selection and user Gemini API key integration
  */
 class ProTutorFragment : Fragment() {
 
@@ -173,6 +175,10 @@ class ProTutorFragment : Fragment() {
         val text = binding.etMessageInput.text.toString().trim()
         if (text.isEmpty() || isLoading) return
 
+        // 💡 ဖုန်းထဲတွင် သိမ်းဆည်းထားသော ကျောင်းသား၏ ကိုယ်ပိုင် Gemini API Key ကို လှမ်းဖတ်ခြင်း
+        val sharedPref = requireContext().getSharedPreferences("AppState", Context.MODE_PRIVATE)
+        val userApiKey = sharedPref.getString("USER_GEMINI_KEY", null)
+
         // Add user message
         val userMessage = ChatMessage(role = ChatMessage.MessageRole.USER, text = text)
         messages.add(userMessage)
@@ -203,8 +209,8 @@ class ProTutorFragment : Fragment() {
                     history = history
                 )
 
-                // 💡 ရွေးချယ်နိုင်သော စနစ် - လောလောဆယ် ကျောင်းသား API Key သိမ်းဆည်းထားခြင်းမရှိသေးပါက null ပို့ထားပါမည်
-                val response = api.sendMessage(apiKey = null, request = request)
+                // 💡 ကျောင်းသား၏ Key ကို Header တန်ဖိုးအဖြစ် လွှဲပြောင်းပေးအပ်လိုက်ခြင်း
+                val response = api.sendMessage(apiKey = userApiKey, request = request)
 
                 if (response.isSuccessful) {
                     val responseText = response.body()?.response ?: "❌ Empty response"
@@ -249,6 +255,16 @@ class ProTutorFragment : Fragment() {
         val dialogBinding = DialogSettingsBinding.inflate(layoutInflater)
         dialogBinding.etBackendUrl.setText(AppState.backendUrl)
 
+        // 💡 လက်ရှိ သိမ်းဆည်းထားသော ကျောင်းသား Key ရှိပါက EditText တွင်း ထည့်သွင်းပြသထားခြင်း
+        val sharedPref = requireContext().getSharedPreferences("AppState", Context.MODE_PRIVATE)
+        val savedKey = sharedPref.getString("USER_GEMINI_KEY", "")
+        
+        try {
+            dialogBinding.root.findViewById<EditText>(R.id.et_gemini_key)?.setText(savedKey)
+        } catch (e: Exception) {
+             Log.e("Settings", "et_gemini_key id not found in dialog layout")
+        }
+
         val dialog = AlertDialog.Builder(requireContext())
             .setView(dialogBinding.root)
             .create()
@@ -257,8 +273,15 @@ class ProTutorFragment : Fragment() {
             val url = dialogBinding.etBackendUrl.text.toString().trim()
             if (url.isNotEmpty()) {
                 AppState.backendUrl = url
-                Toast.makeText(requireContext(), "Backend URL သိမ်းဆည်းပြီး", Toast.LENGTH_SHORT).show()
             }
+
+            // 💡 ကျောင်းသား ရိုက်ထည့်လိုက်သော Gemini API Key ကို အမြဲတမ်းမှတ်မိနေစေရန် SharedPreferences ထဲသို့ သိမ်းဆည်းခြင်း
+            try {
+                val inputKey = dialogBinding.root.findViewById<EditText>(R.id.et_gemini_key)?.text.toString().trim()
+                sharedPref.edit().putString("USER_GEMINI_KEY", if (inputKey.isEmpty()) null else inputKey).apply()
+            } catch (e: Exception) { }
+
+            Toast.makeText(requireContext(), "သတ်မှတ်ချက်များ သိမ်းဆည်းပြီး", Toast.LENGTH_SHORT).show()
             dialog.dismiss()
         }
 

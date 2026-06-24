@@ -35,13 +35,11 @@ app.post('/api/tutor', async (req, res) => {
 
     const systemPrompt = getSystemPrompt(mode, langMode);
 
-    // ခေတ်မီပြီး error ကင်းစင်တဲ့ gemini-2.5-flash မော်ဒယ်ကို ပြောင်းလဲအသုံးပြုထားပါတယ်
     const model = genAI.getGenerativeModel({ 
       model: 'gemini-2.5-flash',
       systemInstruction: systemPrompt
     });
 
-    // History ထဲတွင် user နှင့် model မှလွဲ၍ အခြား role များ လုံးဝမပါရပါ
     const formattedHistory = history.map(msg => ({
       role: msg.role === 'user' ? 'user' : 'model',
       parts: [{ text: msg.text }],
@@ -72,24 +70,52 @@ app.post('/api/tutor', async (req, res) => {
   }
 });
 
-// Vocabulary endpoint
-app.get('/api/vocabulary', (req, res) => {
-  const vocabulary = [
-    { id: 'g1', category: 'greetings', myanmar: 'မင်္ဂလာပါ', russian: 'Привет', pronunciation: 'Privet' },
-    { id: 'g2', category: 'greetings', myanmar: 'ကောင်းပါတယ်', russian: 'Спасибо', pronunciation: 'Spasibo' },
-    { id: 'g3', category: 'greetings', myanmar: 'ကျေးဇူးတင်ပါတယ်', russian: 'Пожалуйста', pronunciation: 'Pozhaluysta' },
-    { id: 'n1', category: 'numbers', myanmar: 'တစ်', russian: 'Один', pronunciation: 'Odin' },
-    { id: 'n2', category: 'numbers', myanmar: 'နှစ်', russian: 'Два', pronunciation: 'Dva' },
-    { id: 'n3', category: 'numbers', myanmar: 'သုံး', russian: 'Три', pronunciation: 'Tri' },
-    { id: 'c1', category: 'common', myanmar: 'ကျွန်တော် ရုရှားဘာသာ သင်ချင်ပါတယ်', russian: 'Я хочу учить русский язык', pronunciation: 'Ya khochu uchit russkiy yazyk' },
-    { id: 'c2', category: 'common', myanmar: 'ဒါကို ရုရှားလို ဘယ်လိုပြောလဲ?', russian: 'Как это сказать по-русски?', pronunciation: 'Kak eto skazat po-russki?' },
-  ];
+// Level အလိုက် Dynamic Flashcards ထုတ်ပေးမည့် Vocabulary Endpoint သစ်
+app.get('/api/vocabulary', async (req, res) => {
+  try {
+    // Android ဘက်မှ ?level=A1 သို့မဟုတ် A2, B1 ဟု လှမ်းပို့သည်ကို ဖတ်ခြင်း
+    const { level = 'A1' } = req.query;
 
-  res.json({
-    success: true,
-    vocabulary,
-    count: vocabulary.length,
-  });
+    const model = genAI.getGenerativeModel({ 
+      model: 'gemini-2.5-flash',
+      systemInstruction: `You are Sayar (ဆရာ), a professional Russian language teacher from Myanmar. Generate 8 high-quality vocabulary flashcards tailored for Myanmar speakers at ${level} level.`
+    });
+
+    const prompt = `Generate 8 useful Russian words or phrases for ${level} level learners. 
+    Return ONLY a valid JSON array of objects. Do not include markdown formatting or backticks.
+    Each object MUST have exactly these keys:
+    {
+      "id": "unique_string_id",
+      "category": "greetings/grammar/daily/travel/etc",
+      "myanmar": "Natural Myanmar translation",
+      "russian": "Correct Russian word in Cyrillic characters",
+      "pronunciation": "Pronunciation hint in Latin characters"
+    }`;
+
+    const result = await model.generateContent(prompt);
+    let responseText = result.response.text().trim();
+
+    // Markdown Backticks (```json ... ```) ပါလာပါက သန့်စင်ဖယ်ထုတ်ခြင်း
+    if (responseText.startsWith('```')) {
+      responseText = responseText.replace(/^```json/, '').replace(/^```/, '').trim();
+    }
+
+    const vocabulary = JSON.parse(responseText);
+
+    res.json({
+      success: true,
+      level: level,
+      vocabulary: vocabulary,
+      count: vocabulary.length
+    });
+
+  } catch (error) {
+    console.error('Vocabulary AI error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to generate vocabulary from AI'
+    });
+  }
 });
 
 // Error handling middleware
@@ -101,32 +127,35 @@ app.use((err, req, res, next) => {
   });
 });
 
+// မြန်မာဆရာစရိုက် အပြည့်အဝသွင်းထားသော System Prompt Builder
 function getSystemPrompt(mode, langMode) {
-  const baseContext = {
-    conversation: 'You are an expert Russian language tutor helping Myanmar speakers learn conversational Russian.',
-    pronunciation: 'You are a Russian pronunciation expert. Help the student practice correct Russian pronunciation and phonetics.',
-    grammar: 'You are a Russian grammar specialist. Explain grammar rules clearly with Myanmar examples.',
-    vocabulary: 'You are a Russian vocabulary teacher. Teach useful words and phrases with context and examples.',
+  const baseInstruction = `You are Sayar (ဆရာ), a native Myanmar citizen who is an absolute expert in the Russian language. 
+You speak flawless, natural, and modern Myanmar language (ဗမာစကား). 
+Your role is to be a friendly, encouraging, and highly professional Russian language tutor for Myanmar students.
+
+CRITICAL ROLEPLAY RULES:
+1. Persona: Act like a real Myanmar person teaching Russian. Use a warm, polite, and helpful tone (e.g., ဗျာ၊ ပါ၊ ခင်ဗျာ၊ နော်).
+2. Language Polish: Your Myanmar explanations must be perfectly natural, grammatically correct, and easy for a Myanmar local to understand. No robotic or direct translations.
+3. Russian Native Fluency: When you provide Russian words, sentences, or examples, they must be 100% accurate, authentic, and naturally spoken in Russia.
+4. Pronunciation Guide: Always provide accurate Latin pronunciation hints for Russian words.`;
+
+  const modeContext = {
+    conversation: 'Focus on teaching everyday conversational Russian that is useful in real life.',
+    pronunciation: 'Focus heavily on correct Russian phonetics, accent, and how to pronounce difficult letters properly.',
+    grammar: 'Explain complex Russian grammar rules simply, using clear comparisons with Myanmar grammar structure.',
+    vocabulary: 'Teach vocabulary with practical example sentences and contexts that Myanmar speakers can relate to.',
   };
 
-  const baseInstruction = baseContext[mode] || baseContext.conversation;
-
-  if (langMode === 'myanmar') {
-    return `${baseInstruction}
-CRITICAL RULES:
-1. Always respond in BOTH Myanmar and Russian
-2. Format: [Myanmar explanation] → [Russian example with pronunciation]
-3. Correct mistakes gently with explanations in Myanmar
-4. Use simple Russian sentences (A1-A2 level)
-5. Include pronunciation hints in Latin characters
-6. Encourage frequently with positive feedback`;
-  }
+  const specificInstruction = modeContext[mode] || modeContext.conversation;
 
   return `${baseInstruction}
-Respond in both Myanmar and Russian languages.
-Use simple, clear explanations suitable for beginners (A1-A2 level).
-Include pronunciation guides in Latin characters.
-Be encouraging and supportive.`;
+${specificInstruction}
+
+CRITICAL FORMATTING RULES FOR RESPONSES:
+- Always reply by clearly separating the Myanmar explanation and the Russian teaching.
+- Format: [Myanmar Explanation & Encouragement] → [Russian text] (Pronunciation Guide)
+- Correct the student's mistakes gently, explaining why it is wrong using perfect Myanmar language.
+- Keep sentences appropriate for the student's selected learning level.`;
 }
 
 app.listen(PORT, () => {

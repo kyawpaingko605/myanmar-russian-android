@@ -8,6 +8,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.Query
 import java.util.concurrent.TimeUnit
@@ -39,7 +40,7 @@ data class HealthResponse(
     @SerializedName("timestamp") val timestamp: String
 )
 
-// ၁။ AI ကတ်ပြား (Vocabulary) အတွက် လိုအပ်သော Data Models များ ဖြည့်စွက်ခြင်း
+// AI ကတ်ပြား (Vocabulary) အတွက် လိုအပ်သော Data Models များ
 data class VocabularyResponse(
     @SerializedName("success") val success: Boolean,
     @SerializedName("level") val level: String,
@@ -60,14 +61,18 @@ data class VocabularyItem(
  */
 interface TutorApi {
     @POST("api/tutor")
-    suspend fun sendMessage(@Body request: TutorRequest): Response<TutorResponse>
+    suspend fun sendMessage(
+        @Header("x-gemini-api-key") apiKey: String?, // 💡 ကျောင်းသား၏ ကိုယ်ပိုင် API Key ကို Header မှ ပို့ရန်
+        @Body request: TutorRequest
+    ): Response<TutorResponse>
 
     @GET("api/health")
     suspend fun checkHealth(): Response<HealthResponse>
 
-    // ၂။ Level အလိုက် AI ထံမှ ကတ်ပြားများ တောင်းရန် API Function အသစ် ထည့်သွင်းခြင်း
+    // Level အလိုက် AI ထံမှ ကတ်ပြားများ တောင်းရန် API Function
     @GET("api/vocabulary")
     suspend fun getVocabulary(
+        @Header("x-gemini-api-key") apiKey: String?, // 💡 Vocabulary ကတ်ပြားတောင်းရာတွင်လည်း Key ပါဝင်စေရန်
         @Query("level") level: String
     ): Response<VocabularyResponse>
 }

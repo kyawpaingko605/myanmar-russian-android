@@ -2,6 +2,8 @@ package com.myanmarrussian.ui
 
 import android.app.AlertDialog
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -28,7 +30,7 @@ import com.myanmarrussian.models.TutorMode
 import kotlinx.coroutines.launch
 
 /**
- * ProTutorFragment - Highly Stable Version with Smart API Limit Detection
+ * ProTutorFragment - Highly Stable Version with Smart API Limit Detection & Key Creation Link
  */
 class ProTutorFragment : Fragment() {
 
@@ -230,11 +232,9 @@ class ProTutorFragment : Fragment() {
                     adapter.notifyItemInserted(messages.size - 1)
                     scrollToBottom()
                 } else {
-                    // API Limit ကုန်သွားခြင်း သို့မဟုတ် Error ကုဒ်တစ်ခုခု ပြန်လာပါက စာတန်းပြသခြင်း
                     showLimitAlertMessage(userApiKey)
                 }
             } catch (e: Exception) {
-                // ဆာဗာမှာ Key မရှိတော့လို့ ချိတ်ဆက်မှုမရတော့တဲ့အခါ စာတန်းပြသခြင်း
                 showLimitAlertMessage(userApiKey)
             } finally {
                 isLoading = false
@@ -275,6 +275,16 @@ class ProTutorFragment : Fragment() {
                 val inputView = mainView.findViewById<View>(resId)
                 if (inputView is EditText) {
                     inputView.setText(savedKey)
+                }
+            }
+
+            // ⚡ Create Gemini Key နှိပ်ရင် Browser ပွင့်လာအောင် လုပ်ဆောင်ချက် ထည့်သွင်းခြင်း
+            val createKeyResId = resources.getIdentifier("btn_create_gemini_key", "id", requireContext().packageName)
+            if (createKeyResId != 0) {
+                val btnCreateKey = mainView.findViewById<View>(createKeyResId)
+                btnCreateKey?.setOnClickListener {
+                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://aistudio.google.com/"))
+                    startActivity(intent)
                 }
             }
 

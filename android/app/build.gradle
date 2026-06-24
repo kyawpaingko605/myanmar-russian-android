@@ -76,8 +76,7 @@ dependencies {
     implementation 'androidx.room:room-ktx:2.6.1'
     kapt 'androidx.room:room-compiler:2.6.1'
 
-    // 💡 Root Detection Library (ဗားရှင်းအမှန်ဖြစ်သော 0.1.0 သို့ ပြောင်းလဲပြင်ဆင်ထားပါသည်)
-    implementation 'com.scottyab:rootbeer-lib:0.1.0'
+    // 💡 ပြဿနာဖြစ်စေသော Rootbeer Library အား ဖယ်ထုတ်ပြီးပါပြီ (Native Code ဖြင့်သာ MainActivity တွင် စစ်ဆေးပါမည်)
 
     // Testing
     testImplementation 'junit:junit:4.13.2'

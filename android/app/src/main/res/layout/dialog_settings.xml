@@ -20,7 +20,7 @@
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="24dp"
+        android:layout_marginBottom="16dp"
         android:hint="@string/backend_url_label"
         app:hintTextColor="@color/accent_blue"
         app:boxStrokeColor="@color/accent_blue"
@@ -38,6 +38,31 @@
             android:textColor="@color/text_primary"
             android:textSize="15sp"
             android:inputType="textUri"
+            android:paddingVertical="14dp" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
+        android:hint="Gemini API Key (Optional)"
+        app:hintTextColor="@color/accent_blue"
+        app:boxStrokeColor="@color/accent_blue"
+        app:boxCornerRadiusTopStart="12dp"
+        app:boxCornerRadiusTopEnd="12dp"
+        app:boxCornerRadiusBottomStart="12dp"
+        app:boxCornerRadiusBottomEnd="12dp"
+        app:passwordToggleEnabled="true"
+        app:passwordToggleTint="@color/text_primary"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/et_gemini_key"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/text_primary"
+            android:textSize="15sp"
+            android:inputType="textPassword"
             android:paddingVertical="14dp" />
     </com.google.android.material.textfield.TextInputLayout>
 

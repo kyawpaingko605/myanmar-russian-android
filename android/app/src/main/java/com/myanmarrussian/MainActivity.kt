@@ -2,9 +2,11 @@ package com.myanmarrussian
 
 import android.content.Context
 import android.net.ConnectivityManager
-import android.net.NetworkCapabilities
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.NavHostFragment
@@ -20,7 +22,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         
-        // 💡 ၁။ မူရင်းကုဒ်အတိုင်း View ကို အရင်ဆုံး အောင်မြင်စွာ တည်ဆောက်ခြင်း
+        // 💡 ၁။ မူရင်းကုဒ်အတိုင်း View ကို အရင်ဆုံး အောင်မြင်စွာ တည်ဆောက်ခြင်း (လုံးဝမပြင်ပါ)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -35,23 +37,25 @@ class MainActivity : AppCompatActivity() {
         bottomNav.itemIconTintList = resources.getColorStateList(R.color.nav_item_color, theme)
         bottomNav.itemTextColor = resources.getColorStateList(R.color.nav_item_color, theme)
 
-        // 💡 ၂။ Library မလိုသော Native နည်းလမ်းဖြင့် လုံခြုံရေးနှင့် အင်တာနက် စစ်ဆေးခြင်း
-        checkSecurityAndInternet()
+        // 💡 ၂။ ဖုန်းတိုင်းတွင် လုံးဝ Crash မဖြစ်စေရန် Handler (MainLooper) သုံးပြီး ဘေးကင်းစွာ စစ်ဆေးခြင်း
+        Handler(Looper.getMainLooper()).post {
+            checkSecurityAndInternet()
+        }
     }
 
     private fun checkSecurityAndInternet() {
-        // ⚠️ Library မသုံးဘဲ Native စနစ်ဖြင့် Root စစ်ဆေးခြင်း
+        // ⚠️ Root စစ်ဆေးခြင်း
         if (isDeviceRooted()) {
-            showSecurityDialog(
+            showUniversalSafeWarning(
                 "လုံခြုံရေး သတိပေးချက်", 
                 "ဤဖုန်းသည် Root ဖောက်ထားသဖြင့် လုံခြုံရေးအရ App အသုံးပြုခွင့်ကို ပိတ်ထားပါသည်။"
             )
             return
         }
 
-        // ⚠️ အင်တာနက် ချိတ်ဆက်ထားခြင်း ရှိ/မရှိ စစ်ဆေးခြင်း
+        // ⚠️ အင်တာနက် စစ်ဆေးခြင်း
         if (!isInternetAvailable()) {
-            showSecurityDialog(
+            showUniversalSafeWarning(
                 "အင်တာနက် လိုအပ်ပါသည်", 
                 "ဤ App ကို အသုံးပြုရန် အင်တာနက် ချိတ်ဆက်မှု လိုအပ်ပါသည်။ ကျေးဇူးပြု၍ အင်တာနက်ပြန်ဖွင့်ပြီး ပြန်ဝင်ပေးပါ။"
             )
@@ -60,67 +64,60 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * ဖုန်းအတွင်းရှိ Root Files များကို တိုက်ရိုက်ရှာဖွေပေးသော စိတ်ချရသည့် Native Function
+     * 💡 ဖုန်းမော်ဒယ်စုံ (Oppo, Vivo, Samsung) တို့တွင် Theme Error ကြောင့် Crash ဖြစ်ခြင်းမှ ရာနှုန်းပြည့်ကာကွယ်ပေးသော စနစ်
+     */
+    private fun showUniversalSafeWarning(title: String, message: String) {
+        if (isFinishing || isDestroyed) return
+
+        try {
+            // ပုံမှန် Dialog ဖြင့် အရင်ကြိုးစားပြသခြင်း
+            AlertDialog.Builder(this)
+                .setTitle(title)
+                .setMessage(message)
+                .setCancelable(false)
+                .setPositiveButton("ထွက်ရန်") { _, _ ->
+                    finishAffinity()
+                }
+                .show()
+        } catch (e: Exception) {
+            // Theme Error ကြောင့် Dialog ဆောက်မရပါက Toast သို့ ပြောင်းလဲပေးပြီး Crash မဖြစ်အောင် တားဆီးခြင်း
+            Toast.makeText(applicationContext, "$title\n$message", Toast.LENGTH_LONG).show()
+            Handler(Looper.getMainLooper()).postDelayed({
+                finishAffinity()
+            }, 2500)
+        }
+    }
+
+    /**
+     * Native နည်းလမ်းဖြင့် Root စစ်ဆေးခြင်း
      */
     private fun isDeviceRooted(): Boolean {
         val buildTags = Build.TAGS
         if (buildTags != null && buildTags.contains("test-keys")) {
             return true
         }
-        try {
+        return try {
             val paths = arrayOf(
-                "/system/app/Superuser.apk",
-                "/sbin/su",
-                "/system/bin/su",
-                "/system/xbin/su",
-                "/data/local/xbin/su",
-                "/data/local/bin/su",
-                "/system/sd/xbin/su",
-                "/system/bin/failsafe/su",
-                "/data/local/su"
+                "/system/app/Superuser.apk", "/sbin/su", "/system/bin/su",
+                "/system/xbin/su", "/data/local/xbin/su", "/data/local/bin/su",
+                "/system/sd/xbin/su", "/system/bin/failsafe/su", "/data/local/su"
             )
-            for (path in paths) {
-                if (File(path).exists()) return true
-            }
+            paths.any { File(it).exists() }
         } catch (e: Exception) {
-            // Ignore
+            false
         }
-        return false
     }
 
     /**
-     * အင်တာနက် ရှိ၊ မရှိ စစ်ဆေးပေးသော ကူညီမည့် Function
+     * ဗားရှင်းအားလုံးအတွက် စိတ်ချရသော အင်တာနက် စစ်ဆေးခြင်း
      */
     private fun isInternetAvailable(): Boolean {
-        val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            val network = connectivityManager.activeNetwork ?: return false
-            val activeNetwork = connectivityManager.getNetworkCapabilities(network) ?: return false
-            return when {
-                activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
-                activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
-                activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> true
-                else -> false
-            }
-        } else {
+        return try {
+            val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
             val networkInfo = connectivityManager.activeNetworkInfo
-            return networkInfo != null && networkInfo.isConnected
-        }
-    }
-
-    /**
-     * စည်းကမ်းမကိုက်ညီပါက App ပိတ်ပစ်မည့် ဒိုင်ယာလော့ခ် ပြသခြင်း
-     */
-    private fun showSecurityDialog(title: String, message: String) {
-        if (!isFinishing) {
-            AlertDialog.Builder(this)
-                .setTitle(title)
-                .setMessage(message)
-                .setCancelable(false)
-                .setPositiveButton("ထွက်ရန်") { _, _ ->
-                    finish() // App အား လုံးဝပိတ်ချပစ်ခြင်း
-                }
-                .show()
+            networkInfo != null && networkInfo.isConnected
+        } catch (e: Exception) {
+            true // Error ဖြစ်လျှင်လည်း Crash မဖြစ်စေဘဲ ဝင်ခွင့်ပေးရန်
         }
     }
 }

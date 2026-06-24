@@ -3,6 +3,7 @@ package com.myanmarrussian.ui
 import android.app.AlertDialog
 import android.os.Bundle
 import android.speech.tts.TextToSpeech
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -258,15 +259,27 @@ class ProTutorFragment : Fragment(), TextToSpeech.OnInitListener {
     private fun playAudio(message: ChatMessage) {
         if (!isTtsReady) return
 
-        val locale = if (currentLangMode == LangMode.MYANMAR) {
-            Locale("my", "MM")
-        } else {
-            Locale("ru", "RU")
-        }
+        val text = message.text
+        // စာသားထဲတွင် ရုရှားစာလုံး (Cyrillic Characters) ပါမပါ စစ်ဆေးခြင်း
+        val containsRussian = text.any { it in '\u0400'..'\u04FF' }
 
-        tts?.language = locale
-        tts?.setSpeechRate(0.8f)
-        tts?.speak(message.text, TextToSpeech.QUEUE_FLUSH, null, "tutor_tts")
+        if (containsRussian) {
+            // ရုရှားစာလုံး ပါဝင်ပါက ရုရှားအသံထွက်စစ်စစ်ဖြင့် နှေးနှေးမှန်မှန် ဖတ်ခိုင်းမည်
+            tts?.language = Locale("ru", "RU")
+            tts?.setSpeechRate(0.85f)
+            tts?.speak(text, TextToSpeech.QUEUE_FLUSH, null, "tutor_tts")
+        } else {
+            // မြန်မာစာသီးသန့်ဖြစ်ပါက မြန်မာအသံထွက်စနစ်သို့ ပြောင်းမည်
+            val result = tts?.setLanguage(Locale("my", "MM"))
+            
+            if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                // ဖုန်းထဲတွင် မြန်မာ Voice Pack မရှိပါက အင်္ဂလိပ်လို လျှောက်မဖတ်ရန် တားဆီးခြင်း
+                Toast.makeText(requireContext(), "မြန်မာအသံထွက်စနစ် သင့်ဖုန်းတွင် မရှိသေးပါ (Google Speech Services တွင် ဒေါင်းလုဒ်လုပ်ပါ)", Toast.LENGTH_LONG).show()
+            } else {
+                tts?.setSpeechRate(1.0f)
+                tts?.speak(text, TextToSpeech.QUEUE_FLUSH, null, "tutor_tts")
+            }
+        }
     }
 
     private fun showSettingsDialog() {

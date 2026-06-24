@@ -2,6 +2,7 @@ package com.myanmarrussian.ui
 
 import android.animation.AnimatorInflater
 import android.animation.AnimatorSet
+import android.content.Context
 import android.os.Bundle
 import android.speech.tts.TextToSpeech
 import android.view.LayoutInflater
@@ -95,7 +96,13 @@ class FlashcardsFragment : Fragment(), TextToSpeech.OnInitListener {
         viewLifecycleOwner.lifecycleScope.launch {
             try {
                 val api = TutorApiService.create(AppState.backendUrl)
-                val response = api.getVocabulary(level)
+
+                // 💡 ဖုန်းထဲတွင် သိမ်းဆည်းထားသော ကျောင်းသား၏ ကိုယ်ပိုင် Gemini API Key ကို လှမ်းဖတ်ခြင်း
+                val sharedPref = requireContext().getSharedPreferences("AppState", Context.MODE_PRIVATE)
+                val userApiKey = sharedPref.getString("USER_GEMINI_KEY", null)
+
+                // 💡 Named arguments သုံး၍ level ရော apiKey ကိုပါ သေချာပေါက် ပူးတွဲပေးပို့ခြင်း
+                val response = api.getVocabulary(level = level, apiKey = userApiKey)
 
                 if (response.isSuccessful && response.body()?.success == true) {
                     val newCards = response.body()?.vocabulary ?: emptyList()

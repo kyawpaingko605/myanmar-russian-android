@@ -62,8 +62,8 @@ data class VocabularyItem(
 interface TutorApi {
     @POST("api/tutor")
     suspend fun sendMessage(
-        @Header("x-gemini-api-key") apiKey: String?, // 💡 ကျောင်းသား၏ ကိုယ်ပိုင် API Key ကို Header မှ ပို့ရန်
-        @Body request: TutorRequest
+        @Body request: TutorRequest,
+        @Header("x-gemini-api-key") apiKey: String? // 💡 Named argument ပိုမိုအဆင်ပြေစေရန် နောက်သို့ ရွှေ့ထားပါသည်
     ): Response<TutorResponse>
 
     @GET("api/health")
@@ -72,8 +72,8 @@ interface TutorApi {
     // Level အလိုက် AI ထံမှ ကတ်ပြားများ တောင်းရန် API Function
     @GET("api/vocabulary")
     suspend fun getVocabulary(
-        @Header("x-gemini-api-key") apiKey: String?, // 💡 Vocabulary ကတ်ပြားတောင်းရာတွင်လည်း Key ပါဝင်စေရန်
-        @Query("level") level: String
+        @Query("level") level: String,
+        @Header("x-gemini-api-key") apiKey: String? // 💡 Flashcards တောင်းရာတွင်လည်း အဆင်ပြေအောင် နောက်ဆုံးတွင် ထားရှိပါသည်
     ): Response<VocabularyResponse>
 }
 

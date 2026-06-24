@@ -11,7 +11,7 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.myanmarrussian.databinding.ActivityMainBinding
-import com.scottyab.rootbeer.RootBeer
+import java.io.File
 
 class MainActivity : AppCompatActivity() {
 
@@ -20,7 +20,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         
-        // 💡 ၁။ မူရင်းကုဒ်အတိုင်း Crash မဖြစ်စေရန် View ကို အရင်ဆုံး တည်ဆောက်ပြီး ချပြလိုက်ခြင်း
+        // 💡 ၁။ မူရင်းကုဒ်အတိုင်း View ကို အရင်ဆုံး အောင်မြင်စွာ တည်ဆောက်ခြင်း
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -35,14 +35,13 @@ class MainActivity : AppCompatActivity() {
         bottomNav.itemIconTintList = resources.getColorStateList(R.color.nav_item_color, theme)
         bottomNav.itemTextColor = resources.getColorStateList(R.color.nav_item_color, theme)
 
-        // 💡 ၂။ မျက်နှာပြင်ပေါ်ပြီးမှ နောက်ကွယ်ကနေ လုံခြုံရေးနှင့် အင်တာနက်ကို စိတ်ချရစွာ စစ်ဆေးခြင်း
+        // 💡 ၂။ Library မလိုသော Native နည်းလမ်းဖြင့် လုံခြုံရေးနှင့် အင်တာနက် စစ်ဆေးခြင်း
         checkSecurityAndInternet()
     }
 
     private fun checkSecurityAndInternet() {
-        // ⚠️ Root ဖောက်ထားခြင်း ရှိ/မရှိ စစ်ဆေးခြင်း
-        val rootBeer = RootBeer(this)
-        if (rootBeer.isRooted) {
+        // ⚠️ Library မသုံးဘဲ Native စနစ်ဖြင့် Root စစ်ဆေးခြင်း
+        if (isDeviceRooted()) {
             showSecurityDialog(
                 "လုံခြုံရေး သတိပေးချက်", 
                 "ဤဖုန်းသည် Root ဖောက်ထားသဖြင့် လုံခြုံရေးအရ App အသုံးပြုခွင့်ကို ပိတ်ထားပါသည်။"
@@ -58,6 +57,35 @@ class MainActivity : AppCompatActivity() {
             )
             return
         }
+    }
+
+    /**
+     * ဖုန်းအတွင်းရှိ Root Files များကို တိုက်ရိုက်ရှာဖွေပေးသော စိတ်ချရသည့် Native Function
+     */
+    private fun isDeviceRooted(): Boolean {
+        val buildTags = Build.TAGS
+        if (buildTags != null && buildTags.contains("test-keys")) {
+            return true
+        }
+        try {
+            val paths = arrayOf(
+                "/system/app/Superuser.apk",
+                "/sbin/su",
+                "/system/bin/su",
+                "/system/xbin/su",
+                "/data/local/xbin/su",
+                "/data/local/bin/su",
+                "/system/sd/xbin/su",
+                "/system/bin/failsafe/su",
+                "/data/local/su"
+            )
+            for (path in paths) {
+                if (File(path).exists()) return true
+            }
+        } catch (e: Exception) {
+            // Ignore
+        }
+        return false
     }
 
     /**

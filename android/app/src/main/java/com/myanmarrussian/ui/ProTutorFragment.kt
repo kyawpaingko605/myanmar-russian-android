@@ -209,8 +209,8 @@ class ProTutorFragment : Fragment() {
                     history = history
                 )
 
-                // 💡 ကျောင်းသား၏ Key ကို Header တန်ဖိုးအဖြစ် လွှဲပြောင်းပေးအပ်လိုက်ခြင်း
-                val response = api.sendMessage(apiKey = userApiKey, request = request)
+                // 💡 Interface ထဲက parameter အစီအစဉ်အတိုင်း တိကျမှန်ကန်စွာ ပေးပို့ခြင်း
+                val response = api.sendMessage(request = request, apiKey = userApiKey)
 
                 if (response.isSuccessful) {
                     val responseText = response.body()?.response ?: "❌ Empty response"
@@ -255,18 +255,21 @@ class ProTutorFragment : Fragment() {
         val dialogBinding = DialogSettingsBinding.inflate(layoutInflater)
         dialogBinding.etBackendUrl.setText(AppState.backendUrl)
 
-        // 💡 လက်ရှိ သိမ်းဆည်းထားသော ကျောင်းသား Key ရှိပါက EditText တွင်း ထည့်သွင်းပြသထားခြင်း
         val sharedPref = requireContext().getSharedPreferences("AppState", Context.MODE_PRIVATE)
         val savedKey = sharedPref.getString("USER_GEMINI_KEY", "")
         
-        try {
-            dialogBinding.root.findViewById<EditText>(R.id.et_gemini_key)?.setText(savedKey)
-        } catch (e: Exception) {
-             Log.e("Settings", "et_gemini_key id not found in dialog layout")
+        // 💡 R.id.et_gemini_key ကြောင့် Unresolved reference မဖြစ်အောင် Dynamic ID ဖြင့် ရှာဖွေခြင်း
+        val mainView = dialogBinding.root
+        val resId = resources.getIdentifier("et_gemini_key", "id", requireContext().packageName)
+        if (resId != 0) {
+            val inputView = mainView.findViewById<View>(resId)
+            if (inputView is EditText) {
+                inputView.setText(savedKey)
+            }
         }
 
         val dialog = AlertDialog.Builder(requireContext())
-            .setView(dialogBinding.root)
+            .setView(mainView)
             .create()
 
         dialogBinding.btnDone.setOnClickListener {
@@ -275,11 +278,14 @@ class ProTutorFragment : Fragment() {
                 AppState.backendUrl = url
             }
 
-            // 💡 ကျောင်းသား ရိုက်ထည့်လိုက်သော Gemini API Key ကို အမြဲတမ်းမှတ်မိနေစေရန် SharedPreferences ထဲသို့ သိမ်းဆည်းခြင်း
-            try {
-                val inputKey = dialogBinding.root.findViewById<EditText>(R.id.et_gemini_key)?.text.toString().trim()
-                sharedPref.edit().putString("USER_GEMINI_KEY", if (inputKey.isEmpty()) null else inputKey).apply()
-            } catch (e: Exception) { }
+            // 💡 SharedPreferences ထဲသို့ Key သိမ်းဆည်းခြင်း
+            if (resId != 0) {
+                val inputView = mainView.findViewById<View>(resId)
+                if (inputView is EditText) {
+                    val inputKey = inputView.text.toString().trim()
+                    sharedPref.edit().putString("USER_GEMINI_KEY", if (inputKey.isEmpty()) null else inputKey).apply()
+                }
+            }
 
             Toast.makeText(requireContext(), "သတ်မှတ်ချက်များ သိမ်းဆည်းပြီး", Toast.LENGTH_SHORT).show()
             dialog.dismiss()

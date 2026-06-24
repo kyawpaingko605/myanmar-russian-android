@@ -28,9 +28,7 @@ import com.myanmarrussian.models.TutorMode
 import kotlinx.coroutines.launch
 
 /**
- * ProTutorFragment - Equivalent to iOS ProTutorView
- * AI-powered chat tutor with language mode, tutor mode selection, user Gemini API key integration
- * and local persistent storage via Room Database.
+ * ProTutorFragment - Highly Stable Version with Smart API Limit Detection
  */
 class ProTutorFragment : Fragment() {
 
@@ -44,7 +42,6 @@ class ProTutorFragment : Fragment() {
     private var currentTutorMode = TutorMode.CONVERSATION
     private var isLoading = false
     
-    // 💡 Database Object အား ကြိုတင်ကြေညာထားခြင်း
     private lateinit var database: AppDatabase
 
     override fun onCreateView(
@@ -59,53 +56,32 @@ class ProTutorFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Initialize Database
-        database = AppDatabase.getDatabase(requireContext())
+        try {
+            database = AppDatabase.getDatabase(requireContext())
 
-        // Set up RecyclerView
-        adapter = ChatMessageAdapter(messages)
-        binding.rvMessages.layoutManager = LinearLayoutManager(requireContext()).apply {
-            stackFromEnd = true
-        }
-        binding.rvMessages.adapter = adapter
+            adapter = ChatMessageAdapter(messages)
+            binding.rvMessages.layoutManager = LinearLayoutManager(requireContext()).apply {
+                stackFromEnd = true
+            }
+            binding.rvMessages.adapter = adapter
 
-        // 💡 မျက်နှာပြင်စဖွင့်လျှင် Room Database ထဲမှ စကားပြောမှတ်တမ်းဟောင်းများကို ဆွဲထုတ်ပြသခြင်း
-        loadChatHistoryFromDatabase()
+            loadChatHistoryFromDatabase()
 
-        // Language mode buttons
-        binding.btnLangMyanmar.setOnClickListener {
-            setLangMode(LangMode.MYANMAR)
-        }
-        binding.btnLangRussian.setOnClickListener {
-            setLangMode(LangMode.RUSSIAN)
-        }
+            binding.btnLangMyanmar.setOnClickListener { setLangMode(LangMode.MYANMAR) }
+            binding.btnLangRussian.setOnClickListener { setLangMode(LangMode.RUSSIAN) }
 
-        // Tutor mode buttons
-        binding.btnModeConversation.setOnClickListener {
-            setTutorMode(TutorMode.CONVERSATION)
-        }
-        binding.btnModePronunciation.setOnClickListener {
-            setTutorMode(TutorMode.PRONUNCIATION)
-        }
-        binding.btnModeGrammar.setOnClickListener {
-            setTutorMode(TutorMode.GRAMMAR)
-        }
-        binding.btnModeVocabulary.setOnClickListener {
-            setTutorMode(TutorMode.VOCABULARY)
-        }
+            binding.btnModeConversation.setOnClickListener { setTutorMode(TutorMode.CONVERSATION) }
+            binding.btnModePronunciation.setOnClickListener { setTutorMode(TutorMode.PRONUNCIATION) }
+            binding.btnModeGrammar.setOnClickListener { setTutorMode(TutorMode.GRAMMAR) }
+            binding.btnModeVocabulary.setOnClickListener { setTutorMode(TutorMode.VOCABULARY) }
 
-        // Settings button
-        binding.btnSettings.setOnClickListener {
-            showSettingsDialog()
-        }
+            binding.btnSettings.setOnClickListener { showSettingsDialog() }
+            binding.btnSend.setOnClickListener { sendMessage() }
 
-        // Send button
-        binding.btnSend.setOnClickListener {
-            sendMessage()
+            updateInputHint()
+        } catch (e: Exception) {
+            Log.e("ProTutorFragment", "Error in onViewCreated: ${e.message}")
         }
-
-        // Update input hint
-        updateInputHint()
     }
 
     private fun loadChatHistoryFromDatabase() {
@@ -138,53 +114,65 @@ class ProTutorFragment : Fragment() {
     }
 
     private fun updateLangModeButtons() {
-        val selectedDrawable = R.drawable.bg_mode_selected
-        val unselectedDrawable = R.drawable.bg_mode_unselected
-        val selectedColor = requireContext().getColor(R.color.text_white)
-        val unselectedColor = requireContext().getColor(R.color.text_primary)
+        try {
+            val selectedDrawable = R.drawable.bg_mode_selected
+            val unselectedDrawable = R.drawable.bg_mode_unselected
+            val selectedColor = requireContext().getColor(R.color.text_white)
+            val unselectedColor = requireContext().getColor(R.color.text_primary)
 
-        if (currentLangMode == LangMode.MYANMAR) {
-            binding.btnLangMyanmar.setBackgroundResource(selectedDrawable)
-            binding.btnLangMyanmar.setTextColor(selectedColor)
-            binding.btnLangRussian.setBackgroundResource(unselectedDrawable)
-            binding.btnLangRussian.setTextColor(unselectedColor)
-        } else {
-            binding.btnLangRussian.setBackgroundResource(selectedDrawable)
-            binding.btnLangRussian.setTextColor(selectedColor)
-            binding.btnLangMyanmar.setBackgroundResource(unselectedDrawable)
-            binding.btnLangMyanmar.setTextColor(unselectedColor)
+            if (currentLangMode == LangMode.MYANMAR) {
+                binding.btnLangMyanmar.setBackgroundResource(selectedDrawable)
+                binding.btnLangMyanmar.setTextColor(selectedColor)
+                binding.btnLangRussian.setBackgroundResource(unselectedDrawable)
+                binding.btnLangRussian.setTextColor(unselectedColor)
+            } else {
+                binding.btnLangRussian.setBackgroundResource(selectedDrawable)
+                binding.btnLangRussian.setTextColor(selectedColor)
+                binding.btnLangMyanmar.setBackgroundResource(unselectedDrawable)
+                binding.btnLangMyanmar.setTextColor(unselectedColor)
+            }
+        } catch (e: Exception) {
+            Log.e("ColorError", "Resource color missing: ${e.message}")
         }
     }
 
     private fun updateTutorModeButtons() {
-        val selectedDrawable = R.drawable.bg_tutor_mode_selected
-        val unselectedDrawable = R.drawable.bg_mode_unselected
-        val selectedColor = requireContext().getColor(R.color.text_white)
-        val unselectedColor = requireContext().getColor(R.color.text_primary)
+        try {
+            val selectedDrawable = R.drawable.bg_tutor_mode_selected
+            val unselectedDrawable = R.drawable.bg_mode_unselected
+            val selectedColor = requireContext().getColor(R.color.text_white)
+            val unselectedColor = requireContext().getColor(R.color.text_primary)
 
-        val modeButtons = mapOf(
-            TutorMode.CONVERSATION to binding.btnModeConversation,
-            TutorMode.PRONUNCIATION to binding.btnModePronunciation,
-            TutorMode.GRAMMAR to binding.btnModeGrammar,
-            TutorMode.VOCABULARY to binding.btnModeVocabulary
-        )
+            val modeButtons = mapOf(
+                TutorMode.CONVERSATION to binding.btnModeConversation,
+                TutorMode.PRONUNCIATION to binding.btnModePronunciation,
+                TutorMode.GRAMMAR to binding.btnModeGrammar,
+                TutorMode.VOCABULARY to binding.btnModeVocabulary
+            )
 
-        modeButtons.forEach { (mode, button) ->
-            if (mode == currentTutorMode) {
-                button.setBackgroundResource(selectedDrawable)
-                button.setTextColor(selectedColor)
-            } else {
-                button.setBackgroundResource(unselectedDrawable)
-                button.setTextColor(unselectedColor)
+            modeButtons.forEach { (mode, button) ->
+                if (mode == currentTutorMode) {
+                    button.setBackgroundResource(selectedDrawable)
+                    button.setTextColor(selectedColor)
+                } else {
+                    button.setBackgroundResource(unselectedDrawable)
+                    button.setTextColor(unselectedColor)
+                }
             }
+        } catch (e: Exception) {
+            Log.e("ColorError", "Resource color missing: ${e.message}")
         }
     }
 
     private fun updateInputHint() {
-        binding.etMessageInput.hint = if (currentLangMode == LangMode.MYANMAR) {
-            getString(R.string.input_hint_myanmar)
-        } else {
-            getString(R.string.input_hint_russian)
+        try {
+            binding.etMessageInput.hint = if (currentLangMode == LangMode.MYANMAR) {
+                getString(R.string.input_hint_myanmar)
+            } else {
+                getString(R.string.input_hint_russian)
+            }
+        } catch (e: Exception) {
+            binding.etMessageInput.hint = "စာရိုက်ပါ..."
         }
     }
 
@@ -202,11 +190,9 @@ class ProTutorFragment : Fragment() {
         val text = binding.etMessageInput.text.toString().trim()
         if (text.isEmpty() || isLoading) return
 
-        // 💡 SharedPreferences ထဲမှ ကျောင်းသား၏ API Key လှမ်းဖတ်ခြင်း
         val sharedPref = requireContext().getSharedPreferences("AppState", Context.MODE_PRIVATE)
         val userApiKey = sharedPref.getString("USER_GEMINI_KEY", null)
 
-        // Add user message to UI List
         val userMessage = ChatMessage(role = ChatMessage.MessageRole.USER, text = text)
         messages.add(userMessage)
         adapter.notifyItemInserted(messages.size - 1)
@@ -217,10 +203,8 @@ class ProTutorFragment : Fragment() {
         isLoading = true
         binding.btnSend.isEnabled = false
 
-        // Call backend API & Handle Database Room Storage
         viewLifecycleOwner.lifecycleScope.launch {
             try {
-                // 💡 User ပို့လိုက်သောစာအား Room Database ထဲသို့ ထည့်သွင်းသိမ်းဆည်းခြင်း
                 database.chatDao().insertMessage(ChatMessageEntity(role = "user", text = text))
 
                 val api = TutorApiService.create(AppState.backendUrl)
@@ -239,35 +223,36 @@ class ProTutorFragment : Fragment() {
 
                 if (response.isSuccessful) {
                     val responseText = response.body()?.response ?: "❌ Empty response"
-                    
-                    // 💡 AI ထံမှ ပြန်ရလာသောစာအား Room Database ထဲသို့ ထည့်သွင်းသိမ်းဆည်းခြင်း
                     database.chatDao().insertMessage(ChatMessageEntity(role = "assistant", text = responseText))
 
-                    val assistantMessage = ChatMessage(
-                        role = ChatMessage.MessageRole.ASSISTANT,
-                        text = responseText
-                    )
+                    val assistantMessage = ChatMessage(role = ChatMessage.MessageRole.ASSISTANT, text = responseText)
                     messages.add(assistantMessage)
                     adapter.notifyItemInserted(messages.size - 1)
                     scrollToBottom()
                 } else {
-                    val errorText = "❌ Error: ${response.code()} - ${response.message()}"
-                    val errorMsg = ChatMessage(role = ChatMessage.MessageRole.ASSISTANT, text = errorText)
-                    messages.add(errorMsg)
-                    adapter.notifyItemInserted(messages.size - 1)
-                    scrollToBottom()
+                    // API Limit ကုန်သွားခြင်း သို့မဟုတ် Error ကုဒ်တစ်ခုခု ပြန်လာပါက စာတန်းပြသခြင်း
+                    showLimitAlertMessage(userApiKey)
                 }
             } catch (e: Exception) {
-                val errorText = "❌ Error: ${e.message ?: "Unknown error"}\n\nBackend URL စစ်ဆေးပါ: ${AppState.backendUrl}"
-                val errorMsg = ChatMessage(role = ChatMessage.MessageRole.ASSISTANT, text = errorText)
-                messages.add(errorMsg)
-                adapter.notifyItemInserted(messages.size - 1)
-                scrollToBottom()
+                // ဆာဗာမှာ Key မရှိတော့လို့ ချိတ်ဆက်မှုမရတော့တဲ့အခါ စာတန်းပြသခြင်း
+                showLimitAlertMessage(userApiKey)
             } finally {
                 isLoading = false
                 binding.btnSend.isEnabled = true
             }
         }
+    }
+
+    private fun showLimitAlertMessage(userApiKey: String?) {
+        val alertMessage = if (userApiKey.isNullOrEmpty()) {
+            "⚠️ ဆရာ့ရဲ့ API Limit ကုန်သွားပါသဖြင့် အပေါ်ညာဘက်ထောင့်က Settings (ဂီယာပုံစံ) ထဲတွင် မိမိကိုယ်ပိုင် Gemini Key ထည့်သွင်း၍ ဆက်လက်အသုံးပြုနိုင်ပါသည်ခင်ဗျာ။"
+        } else {
+            "❌ သင်ထည့်သွင်းထားသော Gemini API Key မှာ အသုံးပြုခွင့် သက်တမ်းကုန်ဆုံးနေခြင်း ဖြစ်နိုင်ပါသည်။ ကျေးဇူးပြု၍ Settings ထဲတွင် Key ကို ပြန်လည်စစ်ဆေးပေးပါ။"
+        }
+        val errorMsg = ChatMessage(role = ChatMessage.MessageRole.ASSISTANT, text = alertMessage)
+        messages.add(errorMsg)
+        adapter.notifyItemInserted(messages.size - 1)
+        scrollToBottom()
     }
 
     private fun scrollToBottom() {
@@ -277,49 +262,56 @@ class ProTutorFragment : Fragment() {
     }
 
     private fun showSettingsDialog() {
-        val dialogBinding = DialogSettingsBinding.inflate(layoutInflater)
-        dialogBinding.etBackendUrl.setText(AppState.backendUrl)
+        try {
+            val dialogBinding = DialogSettingsBinding.inflate(layoutInflater)
+            dialogBinding.etBackendUrl.setText(AppState.backendUrl)
 
-        val sharedPref = requireContext().getSharedPreferences("AppState", Context.MODE_PRIVATE)
-        val savedKey = sharedPref.getString("USER_GEMINI_KEY", "")
-        
-        val mainView = dialogBinding.root
-        val resId = resources.getIdentifier("et_gemini_key", "id", requireContext().packageName)
-        if (resId != 0) {
-            val inputView = mainView.findViewById<View>(resId)
-            if (inputView is EditText) {
-                inputView.setText(savedKey)
-            }
-        }
-
-        val dialog = AlertDialog.Builder(requireContext())
-            .setView(mainView)
-            .create()
-
-        dialogBinding.btnDone.setOnClickListener {
-            val url = dialogBinding.etBackendUrl.text.toString().trim()
-            if (url.isNotEmpty()) {
-                AppState.backendUrl = url
-            }
-
+            val sharedPref = requireContext().getSharedPreferences("AppState", Context.MODE_PRIVATE)
+            val savedKey = sharedPref.getString("USER_GEMINI_KEY", "")
+            
+            val mainView = dialogBinding.root
+            val resId = resources.getIdentifier("et_gemini_key", "id", requireContext().packageName)
             if (resId != 0) {
                 val inputView = mainView.findViewById<View>(resId)
                 if (inputView is EditText) {
-                    val inputKey = inputView.text.toString().trim()
-                    sharedPref.edit().putString("USER_GEMINI_KEY", if (inputKey.isEmpty()) null else inputKey).apply()
+                    inputView.setText(savedKey)
                 }
             }
 
-            Toast.makeText(requireContext(), "သတ်မှတ်ချက်များ သိမ်းဆည်းပြီး", Toast.LENGTH_SHORT).show()
-            dialog.dismiss()
-        }
+            val dialog = AlertDialog.Builder(requireContext())
+                .setView(mainView)
+                .create()
 
-        dialog.show()
+            dialogBinding.btnDone.setOnClickListener {
+                val url = dialogBinding.etBackendUrl.text.toString().trim()
+                if (url.isNotEmpty()) {
+                    AppState.backendUrl = url
+                }
+
+                if (resId != 0) {
+                    val inputView = mainView.findViewById<View>(resId)
+                    if (inputView is EditText) {
+                        val inputKey = inputView.text.toString().trim()
+                        sharedPref.edit().putString("USER_GEMINI_KEY", if (inputKey.isEmpty()) null else inputKey).apply()
+                    }
+                }
+
+                Toast.makeText(requireContext(), "သတ်မှတ်ချက်များ သိမ်းဆည်းပြီး", Toast.LENGTH_SHORT).show()
+                dialog.dismiss()
+            }
+
+            dialog.show()
+        } catch (e: Exception) {
+            Log.e("DialogError", "Error inflating or showing dialog: ${e.message}")
+            Toast.makeText(requireContext(), "ဂီယာပုံစံ ဖွင့်မရပါ၊ XML View ID များကို စစ်ဆေးပါ", Toast.LENGTH_SHORT).show()
+        }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        adapter.onDestroy()
+        try {
+            adapter.onDestroy()
+        } catch (e: Exception) { }
         _binding = null
     }
 }

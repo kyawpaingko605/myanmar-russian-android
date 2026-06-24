@@ -35,9 +35,9 @@ app.post('/api/tutor', async (req, res) => {
 
     const systemPrompt = getSystemPrompt(mode, langMode);
 
-    // ဗားရှင်းအသစ်များအတွက် systemInstruction ကို ဤနေရာတွင် စနစ်တကျ ထည့်သွင်းရပါမည်
+    // ခေတ်မီပြီး error ကင်းစင်တဲ့ gemini-2.5-flash မော်ဒယ်ကို ပြောင်းလဲအသုံးပြုထားပါတယ်
     const model = genAI.getGenerativeModel({ 
-      model: 'gemini-1.5-flash',
+      model: 'gemini-2.5-flash',
       systemInstruction: systemPrompt
     });
 

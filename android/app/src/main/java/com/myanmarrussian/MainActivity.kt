@@ -17,9 +17,10 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // 💡 ကရက်ရှ်မဖြစ်အောင် super.onCreate ကို ထိပ်ဆုံးသို့ ရွှေ့ထားပါသည်
         super.onCreate(savedInstanceState)
 
-        // ⚠️ ၁။ Root ဖောက်ထားခြင်း ရှိ/မရှိ အရင်ဆုံးစစ်ဆေးခြင်း
+        // ⚠️ ၁။ Root ဖောက်ထားခြင်း ရှိ/မရှိ စစ်ဆေးခြင်း
         val rootBeer = RootBeer(this)
         if (rootBeer.isRooted) {
             showSecurityDialog(
@@ -33,7 +34,7 @@ class MainActivity : AppCompatActivity() {
         if (!isInternetAvailable()) {
             showSecurityDialog(
                 "အင်တာနက် လိုအပ်ပါသည်", 
-                "ဤ App ကို အသုံးပြုရန် အင်တာနက် ချိတ်ဆက်မှု လိုအပ်ပါသည်။ ကျေးဇူးပြု၍ အင်တာနက်ပြန်ဖွင့်ပြီး ပြန်ဝင်ပေးပါ။"
+                "ဤ App ကို အသုံးပြုရန် အင်တာနက် ချက်ဆက်မှု လိုအပ်ပါသည်။ ကျေးဇူးပြု၍ အင်တာနက်ပြန်ဖွင့်ပြီး ပြန်ဝင်ပေးပါ။"
             )
             return
         }

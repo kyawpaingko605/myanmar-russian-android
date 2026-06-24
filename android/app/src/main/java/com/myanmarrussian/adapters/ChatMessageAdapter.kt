@@ -13,7 +13,7 @@ import com.myanmarrussian.models.ChatMessage
 import java.util.Locale
 
 /**
- * ChatMessageAdapter - RecyclerView adapter for chat messages with intelligent bilingual TTS and auto-settings redirect
+ * ChatMessageAdapter - RecyclerView adapter for chat messages with intelligent bilingual TTS and direct voice data download redirect
  */
 class ChatMessageAdapter(
     private val messages: MutableList<ChatMessage> = mutableListOf(),
@@ -62,27 +62,36 @@ class ChatMessageAdapter(
         if (hasRussian) {
             // ရုရှားစာလုံးများ ပါဝင်နေပါက ရုရှား လေယူလေသိမ်းစစ်စစ်ဖြင့် အရင်ဖတ်ပေးမည်
             tts?.language = Locale("ru", "RU")
-            tts?.setSpeechRate(0.85f) // ကျောင်းသားနားထောင်ရလွယ်အောင် အနည်းငယ် လျှော့ထားပါသည်
+            tts?.setSpeechRate(0.85f)
             tts?.speak(text, TextToSpeech.QUEUE_FLUSH, null, "chat_tts")
         } else {
             // မြန်မာရှင်းလင်းချက် သီးသန့်ဖြစ်ပါက မြန်မာအသံစနစ်သို့ ပြောင်းလဲဖတ်ပေးမည်
             val result = tts?.setLanguage(Locale("my", "MM"))
             
             if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-                // 💡 မြန်မာ Voice Pack မရှိပါက ပေါ့ပ်အပ်ပြပြီး ဖုန်းရွှေ့ Settings စာမျက်နှာကို တန်းဖွင့်ပေးခြင်း
-                Toast.makeText(context, "မြန်မာအသံထွက်စနစ် မရှိသေးပါ။ Install voice data တွင် Myanmar (Burmese) ကို ဒေါင်းလုဒ်လုပ်ပေးပါ၊", Toast.LENGTH_LONG).show()
+                // 💡 မြန်မာ Voice Pack မရှိပါက ပေါ့ပ်အပ်ပြပြီး Google Voice Data ဒေါင်းလုဒ်စာမျက်နှာသို့ တိုက်ရိုက် ခုန်ကျော်ဖွင့်ပေးခြင်း
+                Toast.makeText(context, "မြန်မာအသံဒေတာ မရှိသေးပါ။ ဒေါင်းလုဒ်စာမျက်နှာသို့ တိုက်ရိုက်ပို့ပေးနေပါသည်...", Toast.LENGTH_LONG).show()
                 
                 try {
-                    val intent = Intent().apply {
-                        action = "com.android.settings.TTS_SETTINGS"
+                    // Correct implementation for direct intent launch
+                    val intent = Intent(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA).apply {
+                        setPackage("com.google.android.tts")
                         flags = Intent.FLAG_ACTIVITY_NEW_TASK
                     }
                     context.startActivity(intent)
                 } catch (e: Exception) {
-                    val intent = Intent(Settings.ACTION_SETTINGS).apply {
-                        flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                    // အကယ်၍ Intent တိုက်ရိုက်သွားရခက်ပါက အထွေထွေ TTS Settings ကို ဖွင့်ပေးခြင်း
+                    try {
+                        val intent = Intent("com.android.settings.TTS_SETTINGS").apply {
+                            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                        }
+                        context.startActivity(intent)
+                    } catch (ex: Exception) {
+                        val intent = Intent(Settings.ACTION_SETTINGS).apply {
+                            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                        }
+                        context.startActivity(intent)
                     }
-                    context.startActivity(intent)
                 }
             } else {
                 tts?.setSpeechRate(1.0f)

@@ -2,7 +2,6 @@ package com.myanmarrussian.ui
 
 import android.app.AlertDialog
 import android.os.Bundle
-import android.speech.tts.TextToSpeech
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -23,13 +22,12 @@ import com.myanmarrussian.models.ChatMessage
 import com.myanmarrussian.models.LangMode
 import com.myanmarrussian.models.TutorMode
 import kotlinx.coroutines.launch
-import java.util.Locale
 
 /**
  * ProTutorFragment - Equivalent to iOS ProTutorView
  * AI-powered chat tutor with language mode and tutor mode selection
  */
-class ProTutorFragment : Fragment(), TextToSpeech.OnInitListener {
+class ProTutorFragment : Fragment() {
 
     private var _binding: FragmentProTutorBinding? = null
     private val binding get() = _binding!!
@@ -40,8 +38,6 @@ class ProTutorFragment : Fragment(), TextToSpeech.OnInitListener {
     private var currentLangMode = LangMode.MYANMAR
     private var currentTutorMode = TutorMode.CONVERSATION
     private var isLoading = false
-    private var tts: TextToSpeech? = null
-    private var isTtsReady = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -55,13 +51,8 @@ class ProTutorFragment : Fragment(), TextToSpeech.OnInitListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Initialize TTS
-        tts = TextToSpeech(requireContext(), this)
-
-        // Set up RecyclerView
-        adapter = ChatMessageAdapter(messages) { message ->
-            playAudio(message)
-        }
+        // Set up RecyclerView (အသံထွက်လုပ်ဆောင်ချက်ကို ChatMessageAdapter တွင်းသို့ တိုက်ရိုက်လွှဲပြောင်းပေးအပ်ထားပါသည်)
+        adapter = ChatMessageAdapter(messages)
         binding.rvMessages.layoutManager = LinearLayoutManager(requireContext()).apply {
             stackFromEnd = true
         }
@@ -212,7 +203,8 @@ class ProTutorFragment : Fragment(), TextToSpeech.OnInitListener {
                     history = history
                 )
 
-                val response = api.sendMessage(request)
+                // 💡 ရွေးချယ်နိုင်သော စနစ် - လောလောဆယ် ကျောင်းသား API Key သိမ်းဆည်းထားခြင်းမရှိသေးပါက null ပို့ထားပါမည်
+                val response = api.sendMessage(apiKey = null, request = request)
 
                 if (response.isSuccessful) {
                     val responseText = response.body()?.response ?: "❌ Empty response"
@@ -223,9 +215,6 @@ class ProTutorFragment : Fragment(), TextToSpeech.OnInitListener {
                     messages.add(assistantMessage)
                     adapter.notifyItemInserted(messages.size - 1)
                     scrollToBottom()
-
-                    // Auto-play response
-                    playAudio(assistantMessage)
                 } else {
                     val errorMsg = ChatMessage(
                         role = ChatMessage.MessageRole.ASSISTANT,
@@ -256,32 +245,6 @@ class ProTutorFragment : Fragment(), TextToSpeech.OnInitListener {
         }
     }
 
-    private fun playAudio(message: ChatMessage) {
-        if (!isTtsReady) return
-
-        val text = message.text
-        // စာသားထဲတွင် ရုရှားစာလုံး (Cyrillic Characters) ပါမပါ စစ်ဆေးခြင်း
-        val containsRussian = text.any { it in '\u0400'..'\u04FF' }
-
-        if (containsRussian) {
-            // ရုရှားစာလုံး ပါဝင်ပါက ရုရှားအသံထွက်စစ်စစ်ဖြင့် နှေးနှေးမှန်မှန် ဖတ်ခိုင်းမည်
-            tts?.language = Locale("ru", "RU")
-            tts?.setSpeechRate(0.85f)
-            tts?.speak(text, TextToSpeech.QUEUE_FLUSH, null, "tutor_tts")
-        } else {
-            // မြန်မာစာသီးသန့်ဖြစ်ပါက မြန်မာအသံထွက်စနစ်သို့ ပြောင်းမည်
-            val result = tts?.setLanguage(Locale("my", "MM"))
-            
-            if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-                // ဖုန်းထဲတွင် မြန်မာ Voice Pack မရှိပါက အင်္ဂလိပ်လို လျှောက်မဖတ်ရန် တားဆီးခြင်း
-                Toast.makeText(requireContext(), "မြန်မာအသံထွက်စနစ် သင့်ဖုန်းတွင် မရှိသေးပါ (Google Speech Services တွင် ဒေါင်းလုဒ်လုပ်ပါ)", Toast.LENGTH_LONG).show()
-            } else {
-                tts?.setSpeechRate(1.0f)
-                tts?.speak(text, TextToSpeech.QUEUE_FLUSH, null, "tutor_tts")
-            }
-        }
-    }
-
     private fun showSettingsDialog() {
         val dialogBinding = DialogSettingsBinding.inflate(layoutInflater)
         dialogBinding.etBackendUrl.setText(AppState.backendUrl)
@@ -302,16 +265,9 @@ class ProTutorFragment : Fragment(), TextToSpeech.OnInitListener {
         dialog.show()
     }
 
-    override fun onInit(status: Int) {
-        if (status == TextToSpeech.SUCCESS) {
-            isTtsReady = true
-        }
-    }
-
     override fun onDestroyView() {
         super.onDestroyView()
-        tts?.stop()
-        tts?.shutdown()
+        adapter.onDestroy() // Adapter အတွင်းရှိ TTS Resource ကို အလိုအလျောက် ပိတ်သိမ်းခြင်း
         _binding = null
     }
 }

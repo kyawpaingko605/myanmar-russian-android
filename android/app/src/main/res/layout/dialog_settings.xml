@@ -42,53 +42,50 @@
             android:paddingVertical="16dp" />
     </com.google.android.material.textfield.TextInputLayout>
 
-    <LinearLayout
+    <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_marginBottom="32dp">
+        android:layout_marginBottom="6dp"
+        android:hint="Gemini API Key (Optional)"
+        app:hintTextColor="@color/accent_blue"
+        app:boxStrokeColor="@color/accent_blue"
+        app:boxCornerRadiusTopStart="12dp"
+        app:boxCornerRadiusTopEnd="12dp"
+        app:boxCornerRadiusBottomStart="12dp"
+        app:boxCornerRadiusBottomEnd="12dp"
+        app:passwordToggleEnabled="true"
+        app:passwordToggleTint="@color/text_primary"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/til_gemini_key"
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/et_gemini_key"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Gemini API Key (Optional)"
-            app:hintTextColor="@color/accent_blue"
-            app:boxStrokeColor="@color/accent_blue"
-            app:boxCornerRadiusTopStart="12dp"
-            app:boxCornerRadiusTopEnd="12dp"
-            app:boxCornerRadiusBottomStart="12dp"
-            app:boxCornerRadiusBottomEnd="12dp"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+            android:textColor="@color/text_primary"
+            android:textSize="15sp"
+            android:inputType="textPassword"
+            android:paddingVertical="16dp" />
+    </com.google.android.material.textfield.TextInputLayout>
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/et_gemini_key"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="@color/text_primary"
-                android:textSize="15sp"
-                android:inputType="textVisiblePassword"
-                android:paddingVertical="16dp" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btn_create_key"
-            style="@style/Widget.MaterialComponents.Button.TextButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:layout_marginTop="4dp"
-            android:text="Create Gemini Key"
-            android:textColor="@color/accent_blue"
-            android:textSize="13sp"
-            android:textStyle="bold"
-            app:icon="@android:drawable/ic_menu_add"
-            app:iconSize="16dp"
-            app:iconTint="@color/accent_blue"
-            android:insetTop="0dp"
-            android:insetBottom="0dp"
-            android:paddingHorizontal="8dp" />
-    </LinearLayout>
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_create_gemini_key"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:layout_marginBottom="24dp"
+        android:text="Get Gemini Key Online"
+        android:textColor="@color/accent_blue"
+        android:textSize="13sp"
+        android:textStyle="bold"
+        android:letterSpacing="0.03"
+        app:icon="@android:drawable/ic_menu_send"
+        app:iconSize="14dp"
+        app:iconTint="@color/accent_blue"
+        app:iconGravity="textEnd"
+        android:paddingHorizontal="8dp"
+        android:insetTop="0dp"
+        android:insetBottom="0dp" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_done"

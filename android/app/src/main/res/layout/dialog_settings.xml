@@ -13,9 +13,10 @@
         android:layout_height="wrap_content"
         android:text="@string/settings_title"
         android:textColor="@color/text_primary"
-        android:textSize="20sp"
+        android:textSize="22sp"
         android:textStyle="bold"
-        android:layout_marginBottom="20dp" />
+        android:letterSpacing="0.02"
+        android:layout_marginBottom="24dp" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
@@ -38,36 +39,56 @@
             android:textColor="@color/text_primary"
             android:textSize="15sp"
             android:inputType="textUri"
-            android:paddingVertical="14dp" />
+            android:paddingVertical="16dp" />
     </com.google.android.material.textfield.TextInputLayout>
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/til_gemini_key"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="24dp"
-        android:hint="Gemini API Key (Optional)"
-        app:hintTextColor="@color/accent_blue"
-        app:boxStrokeColor="@color/accent_blue"
-        app:boxCornerRadiusTopStart="12dp"
-        app:boxCornerRadiusTopEnd="12dp"
-        app:boxCornerRadiusBottomStart="12dp"
-        app:boxCornerRadiusBottomEnd="12dp"
-        app:endIconMode="custom"
-        app:endIconDrawable="@android:drawable/ic_menu_edit"
-        app:endIconContentDescription="Create Gemini Key"
-        app:endIconTint="@color/accent_blue"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        android:orientation="vertical"
+        android:layout_marginBottom="32dp">
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/et_gemini_key"
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_gemini_key"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="@color/text_primary"
-            android:textSize="15sp"
-            android:inputType="textVisiblePassword"
-            android:paddingVertical="14dp" />
-    </com.google.android.material.textfield.TextInputLayout>
+            android:hint="Gemini API Key (Optional)"
+            app:hintTextColor="@color/accent_blue"
+            app:boxStrokeColor="@color/accent_blue"
+            app:boxCornerRadiusTopStart="12dp"
+            app:boxCornerRadiusTopEnd="12dp"
+            app:boxCornerRadiusBottomStart="12dp"
+            app:boxCornerRadiusBottomEnd="12dp"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_gemini_key"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/text_primary"
+                android:textSize="15sp"
+                android:inputType="textVisiblePassword"
+                android:paddingVertical="16dp" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_create_key"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginTop="4dp"
+            android:text="Create Gemini Key"
+            android:textColor="@color/accent_blue"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            app:icon="@android:drawable/ic_menu_add"
+            app:iconSize="16dp"
+            app:iconTint="@color/accent_blue"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:paddingHorizontal="8dp" />
+    </LinearLayout>
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_done"
@@ -79,7 +100,7 @@
         android:textStyle="bold"
         app:backgroundTint="@color/primary"
         app:cornerRadius="12dp"
-        android:padding="14dp"
+        android:padding="16dp"
         android:insetTop="0dp"
         android:insetBottom="0dp" />
 

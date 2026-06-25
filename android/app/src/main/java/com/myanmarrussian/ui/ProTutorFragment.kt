@@ -9,7 +9,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
@@ -270,53 +269,35 @@ class ProTutorFragment : Fragment() {
             val sharedPref = requireContext().getSharedPreferences("AppState", Context.MODE_PRIVATE)
             val savedKey = sharedPref.getString("USER_GEMINI_KEY", "")
             
-            val mainView = dialogBinding.root
-            val resId = resources.getIdentifier("et_gemini_key", "id", requireContext().packageName)
-            if (resId != 0) {
-                val inputView = mainView.findViewById<View>(resId)
-                if (inputView is EditText) {
-                    inputView.setText(savedKey)
-                }
+            // XML ထဲက ID အမှန်အတိုင်း တိုက်ရိုက်ယူပြီး ထည့်ပေးထားပါတယ်
+            dialogBinding.etGeminiKey.setText(savedKey)
+
+            // ⚡ ၁။ Get Gemini Key နှိပ်ရင် Browser Link ပွင့်ရန်
+            dialogBinding.btnCreateGeminiKey.setOnClickListener {
+                val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://aistudio.google.com/"))
+                startActivity(intent)
             }
 
-            // ⚡ Create Gemini Key နှိပ်ရင် Browser ပွင့်လာအောင် လုပ်ဆောင်ချက် ထည့်သွင်းခြင်း
-            val createKeyResId = resources.getIdentifier("btn_create_gemini_key", "id", requireContext().packageName)
-            if (createKeyResId != 0) {
-                val btnCreateKey = mainView.findViewById<View>(createKeyResId)
-                btnCreateKey?.setOnClickListener {
-                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://aistudio.google.com/"))
-                    startActivity(intent)
-                }
+            // ☀️ ၂။ Light Mode ပြောင်းလဲခြင်း
+            dialogBinding.btnThemeLight.setOnClickListener {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+                Toast.makeText(requireContext(), "Light Mode ပြောင်းလိုက်ပါပြီ", Toast.LENGTH_SHORT).show()
             }
 
-            // 🌓 Theme ပြောင်းလဲခြင်း လုပ်ဆောင်ချက်များ ထည့်သွင်းခြင်း
-            val lightResId = resources.getIdentifier("btn_theme_light", "id", requireContext().packageName)
-            val darkResId = resources.getIdentifier("btn_theme_dark", "id", requireContext().packageName)
-            val autoResId = resources.getIdentifier("btn_theme_auto", "id", requireContext().packageName)
-
-            if (lightResId != 0) {
-                mainView.findViewById<View>(lightResId)?.setOnClickListener {
-                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-                    Toast.makeText(requireContext(), "Light Mode ပြောင်းလိုက်ပါပြီ", Toast.LENGTH_SHORT).show()
-                }
+            // 🌙 ၃။ Dark Mode ပြောင်းလဲခြင်း
+            dialogBinding.btnThemeDark.setOnClickListener {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+                Toast.makeText(requireContext(), "Dark Mode ပြောင်းလိုက်ပါပြီ", Toast.LENGTH_SHORT).show()
             }
 
-            if (darkResId != 0) {
-                mainView.findViewById<View>(darkResId)?.setOnClickListener {
-                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-                    Toast.makeText(requireContext(), "Dark Mode ပြောင်းလိုက်ပါပြီ", Toast.LENGTH_SHORT).show()
-                }
-            }
-
-            if (autoResId != 0) {
-                mainView.findViewById<View>(autoResId)?.setOnClickListener {
-                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
-                    Toast.makeText(requireContext(), "System Auto Mode ပြောင်းလိုက်ပါပြီ", Toast.LENGTH_SHORT).show()
-                }
+            // ⚙️ ၄။ System Auto Mode ပြောင်းလဲခြင်း
+            dialogBinding.btnThemeAuto.setOnClickListener {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+                Toast.makeText(requireContext(), "System Auto Mode ပြောင်းလိုက်ပါပြီ", Toast.LENGTH_SHORT).show()
             }
 
             val dialog = AlertDialog.Builder(requireContext())
-                .setView(mainView)
+                .setView(dialogBinding.root)
                 .create()
 
             dialogBinding.btnDone.setOnClickListener {
@@ -325,13 +306,8 @@ class ProTutorFragment : Fragment() {
                     AppState.backendUrl = url
                 }
 
-                if (resId != 0) {
-                    val inputView = mainView.findViewById<View>(resId)
-                    if (inputView is EditText) {
-                        val inputKey = inputView.text.toString().trim()
-                        sharedPref.edit().putString("USER_GEMINI_KEY", if (inputKey.isEmpty()) null else inputKey).apply()
-                    }
-                }
+                val inputKey = dialogBinding.etGeminiKey.text.toString().trim()
+                sharedPref.edit().putString("USER_GEMINI_KEY", if (inputKey.isEmpty()) null else inputKey).apply()
 
                 Toast.makeText(requireContext(), "သတ်မှတ်ချက်များ သိမ်းဆည်းပြီး", Toast.LENGTH_SHORT).show()
                 dialog.dismiss()
@@ -340,7 +316,7 @@ class ProTutorFragment : Fragment() {
             dialog.show()
         } catch (e: Exception) {
             Log.e("DialogError", "Error inflating or showing dialog: ${e.message}")
-            Toast.makeText(requireContext(), "ဂီယာပုံစံ ဖွင့်မရပါ၊ XML View ID များကို စစ်ဆေးပါ", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), "ဂီယာပုံစံ ဖွင့်မရပါ၊ ကုဒ်များကို ပြန်လည်စစ်ဆေးပါ", Toast.LENGTH_SHORT).show()
         }
     }
 

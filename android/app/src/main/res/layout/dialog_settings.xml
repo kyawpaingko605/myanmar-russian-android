@@ -42,9 +42,10 @@
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/til_gemini_key"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="12dp"
+        android:layout_marginBottom="24dp"
         android:hint="Gemini API Key (Optional)"
         app:hintTextColor="@color/accent_blue"
         app:boxStrokeColor="@color/accent_blue"
@@ -52,8 +53,10 @@
         app:boxCornerRadiusTopEnd="12dp"
         app:boxCornerRadiusBottomStart="12dp"
         app:boxCornerRadiusBottomEnd="12dp"
-        app:passwordToggleEnabled="true"
-        app:passwordToggleTint="@color/text_primary"
+        app:endIconMode="custom"
+        app:endIconDrawable="@android:drawable/ic_menu_edit"
+        app:endIconContentDescription="Create Gemini Key"
+        app:endIconTint="@color/accent_blue"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
         <com.google.android.material.textfield.TextInputEditText
@@ -62,21 +65,9 @@
             android:layout_height="wrap_content"
             android:textColor="@color/text_primary"
             android:textSize="15sp"
-            android:inputType="textPassword"
+            android:inputType="textVisiblePassword"
             android:paddingVertical="14dp" />
     </com.google.android.material.textfield.TextInputLayout>
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btn_create_gemini_key"
-        style="@style/Widget.MaterialComponents.Button.TextButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end"
-        android:layout_marginBottom="16dp"
-        android:text="🔑 Create Gemini Key"
-        android:textColor="@color/accent_blue"
-        android:textSize="14sp"
-        android:textStyle="bold" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_done"

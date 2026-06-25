@@ -11,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -285,6 +286,32 @@ class ProTutorFragment : Fragment() {
                 btnCreateKey?.setOnClickListener {
                     val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://aistudio.google.com/"))
                     startActivity(intent)
+                }
+            }
+
+            // 🌓 Theme ပြောင်းလဲခြင်း လုပ်ဆောင်ချက်များ ထည့်သွင်းခြင်း
+            val lightResId = resources.getIdentifier("btn_theme_light", "id", requireContext().packageName)
+            val darkResId = resources.getIdentifier("btn_theme_dark", "id", requireContext().packageName)
+            val autoResId = resources.getIdentifier("btn_theme_auto", "id", requireContext().packageName)
+
+            if (lightResId != 0) {
+                mainView.findViewById<View>(lightResId)?.setOnClickListener {
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+                    Toast.makeText(requireContext(), "Light Mode ပြောင်းလိုက်ပါပြီ", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            if (darkResId != 0) {
+                mainView.findViewById<View>(darkResId)?.setOnClickListener {
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+                    Toast.makeText(requireContext(), "Dark Mode ပြောင်းလိုက်ပါပြီ", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            if (autoResId != 0) {
+                mainView.findViewById<View>(autoResId)?.setOnClickListener {
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+                    Toast.makeText(requireContext(), "System Auto Mode ပြောင်းလိုက်ပါပြီ", Toast.LENGTH_SHORT).show()
                 }
             }
 

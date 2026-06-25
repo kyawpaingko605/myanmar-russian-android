@@ -9,6 +9,7 @@ import android.os.Looper
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -20,6 +21,12 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // 🌓 ⚡ [ဖြည့်စွက်ချက်] App စဖွင့်လိုက်တာနဲ့ သိမ်းဆည်းထားဖူးတဲ့ Theme mode ကို အရင်ဆုံး ဖတ်ယူပြီး သက်ရောက်စေခြင်း
+        // အခြား ကုဒ်တွေ အလုပ်မလုပ်ခင် Theme ကို အရင်ပြောင်းထားမှ တစ်ဖန်ပြန်ပွင့်လာတဲ့အခါ (Recreate ဖြစ်တဲ့အခါ) ကမောက်ကမ မဖြစ်မှာပါ
+        val sharedPref = getSharedPreferences("AppState", Context.MODE_PRIVATE)
+        val savedTheme = sharedPref.getInt("APP_THEME_MODE", AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+        AppCompatDelegate.setDefaultNightMode(savedTheme)
+
         super.onCreate(savedInstanceState)
         
         // 💡 ၁။ မူရင်းကုဒ်အတိုင်း View ကို အရင်ဆုံး အောင်မြင်စွာ တည်ဆောက်ခြင်း (လုံးဝမပြင်ပါ)

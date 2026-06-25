@@ -266,34 +266,43 @@ class ProTutorFragment : Fragment() {
             val dialogBinding = DialogSettingsBinding.inflate(layoutInflater)
             dialogBinding.etBackendUrl.setText(AppState.backendUrl)
 
-            val sharedPref = requireContext().getSharedPreferences("AppState", Context.MODE_PRIVATE)
-            val savedKey = sharedPref.getString("USER_GEMINI_KEY", "")
-            
-            // XML ထဲက ID အမှန်အတိုင်း တိုက်ရိုက်ယူပြီး ထည့်ပေးထားပါတယ်
+            val sharedPref = activity?.getSharedPreferences("AppState", Context.MODE_PRIVATE)
+            val savedKey = sharedPref?.getString("USER_GEMINI_KEY", "")
             dialogBinding.etGeminiKey.setText(savedKey)
 
-            // ⚡ ၁။ Get Gemini Key နှိပ်ရင် Browser Link ပွင့်ရန်
+            // 🌓 ၁။ လက်ရှိ သိမ်းထားဖူးသော Theme Mode အလိုက် ခလုတ်ကို Toggle Group ထဲတွင် အလိုအလျောက် ရွေးချယ်ပေးထားခြင်း
+            val currentTheme = sharedPref?.getInt("APP_THEME_MODE", AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM) ?: AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+            when (currentTheme) {
+                AppCompatDelegate.MODE_NIGHT_NO -> dialogBinding.toggleGroupTheme.check(R.id.btn_theme_light)
+                AppCompatDelegate.MODE_NIGHT_YES -> dialogBinding.toggleGroupTheme.check(R.id.btn_theme_dark)
+                else -> dialogBinding.toggleGroupTheme.check(R.id.btn_theme_auto)
+            }
+
+            // 🌓 ၂။ MaterialButtonToggleGroup ရဲ့ အပြောင်းအလဲစနစ်ကို သုံးပြီး Theme ပြောင်းလဲခြင်းနှင့် ဒေတာတစ်ပါတည်းသိမ်းခြင်း
+            dialogBinding.toggleGroupTheme.addOnButtonCheckedListener { _, checkedId, isChecked ->
+                if (isChecked) {
+                    val mode = when (checkedId) {
+                        R.id.btn_theme_light -> AppCompatDelegate.MODE_NIGHT_NO
+                        R.id.btn_theme_dark -> AppCompatDelegate.MODE_NIGHT_YES
+                        else -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+                    }
+
+                    AppCompatDelegate.setDefaultNightMode(mode)
+                    sharedPref?.edit()?.putInt("APP_THEME_MODE", mode)?.apply()
+
+                    val toastMsg = when (checkedId) {
+                        R.id.btn_theme_light -> "Light Mode ပြောင်းလိုက်ပါပြီ"
+                        R.id.btn_theme_dark -> "Dark Mode ပြောင်းလိုက်ပါပြီ"
+                        else -> "System Auto Mode ပြောင်းလိုက်ပါပြီ"
+                    }
+                    Toast.makeText(requireContext(), toastMsg, Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            // ⚡ ၃။ Get Gemini Key နှိပ်ရင် Browser Link ပွင့်ရန်
             dialogBinding.btnCreateGeminiKey.setOnClickListener {
                 val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://aistudio.google.com/"))
                 startActivity(intent)
-            }
-
-            // ☀️ ၂။ Light Mode ပြောင်းလဲခြင်း
-            dialogBinding.btnThemeLight.setOnClickListener {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-                Toast.makeText(requireContext(), "Light Mode ပြောင်းလိုက်ပါပြီ", Toast.LENGTH_SHORT).show()
-            }
-
-            // 🌙 ၃။ Dark Mode ပြောင်းလဲခြင်း
-            dialogBinding.btnThemeDark.setOnClickListener {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-                Toast.makeText(requireContext(), "Dark Mode ပြောင်းလိုက်ပါပြီ", Toast.LENGTH_SHORT).show()
-            }
-
-            // ⚙️ ၄။ System Auto Mode ပြောင်းလဲခြင်း
-            dialogBinding.btnThemeAuto.setOnClickListener {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
-                Toast.makeText(requireContext(), "System Auto Mode ပြောင်းလိုက်ပါပြီ", Toast.LENGTH_SHORT).show()
             }
 
             val dialog = AlertDialog.Builder(requireContext())
@@ -307,7 +316,7 @@ class ProTutorFragment : Fragment() {
                 }
 
                 val inputKey = dialogBinding.etGeminiKey.text.toString().trim()
-                sharedPref.edit().putString("USER_GEMINI_KEY", if (inputKey.isEmpty()) null else inputKey).apply()
+                sharedPref?.edit()?.putString("USER_GEMINI_KEY", if (inputKey.isEmpty()) null else inputKey)?.apply()
 
                 Toast.makeText(requireContext(), "သတ်မှတ်ချက်များ သိမ်းဆည်းပြီး", Toast.LENGTH_SHORT).show()
                 dialog.dismiss()

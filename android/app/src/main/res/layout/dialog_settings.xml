@@ -8,15 +8,60 @@
     android:padding="24dp"
     android:background="@color/background">
 
-    <TextView
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/settings_title"
-        android:textColor="@color/text_primary"
-        android:textSize="22sp"
-        android:textStyle="bold"
-        android:letterSpacing="0.02"
-        android:layout_marginBottom="24dp" />
+        android:layout_marginBottom="24dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_centerInParent="true"
+            android:text="@string/settings_title"
+            android:textColor="@color/text_primary"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.02" />
+
+        <com.google.android.material.button.MaterialButtonToggleGroup
+            android:id="@+id/toggle_group_theme"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerInParent="true"
+            app:singleSelection="true"
+            app:checkedButton="@id/btn_theme_auto">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_theme_light"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="38dp"
+                android:text="Light"
+                android:textSize="12sp"
+                android:paddingHorizontal="10dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_theme_dark"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="38dp"
+                android:text="Dark"
+                android:textSize="12sp"
+                android:paddingHorizontal="10dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_theme_auto"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="38dp"
+                android:text="Auto"
+                android:textSize="12sp"
+                android:paddingHorizontal="10dp" />
+
+        </com.google.android.material.button.MaterialButtonToggleGroup>
+    </RelativeLayout>
 
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"

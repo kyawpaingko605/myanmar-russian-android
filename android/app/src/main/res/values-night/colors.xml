@@ -2,7 +2,7 @@
 <resources>
     <color name="primary">#0A84FF</color>
     <color name="primary_dark">#0056B3</color>
-    <color name="primary_light">#5856D6</color>
+    <color name="primary_light">#1C2A3A</color>
     <color name="primary_gradient_start">#0A84FF</color>
     <color name="primary_gradient_end">#5856D6</color>
 
@@ -11,16 +11,17 @@
     <color name="accent_green">#30D158</color>
     <color name="accent_orange">#FF9500</color>
 
-    <color name="background">#121212</color>      <color name="surface">#1C1C1E</color>         <color name="card_background">#2C2C2E</color>  <color name="text_primary">#FFFFFF</color>    <color name="text_secondary">#AEAEB2</color>  <color name="text_white">#FFFFFF</color>
+    <color name="background">#000000</color>      <color name="surface">#121212</color>         <color name="card_background">#1C1C1E</color> <color name="text_primary">#F5F5F7</color>    <color name="text_secondary">#8E8E93</color>
+    <color name="text_white">#FFFFFF</color>
     <color name="text_white_70">#B3FFFFFF</color>
 
     <color name="correct_green">#30D158</color>
     <color name="wrong_red">#FF453A</color>
-    <color name="correct_bg">#1C3A27</color>
-    <color name="wrong_bg">#3D1C1A</color>
+    <color name="correct_bg">#0A2A16</color>
+    <color name="wrong_bg">#2C0D0B</color>
 
     <color name="nav_selected">#0A84FF</color>
-    <color name="nav_unselected">#8E8E93</color>
+    <color name="nav_unselected">#636366</color>
 
     <color name="progress_green">#30B0C7</color>
     <color name="progress_purple">#AF52DE</color>
@@ -28,4 +29,4 @@
     <color name="progress_red">#FF453A</color>
     <color name="progress_orange">#FF9500</color>
 
-    <color name="user_bubble">#0A84FF</color>         <color name="assistant_bubble">#2C2C2E</color>    </resources>
+    <color name="user_bubble">#0A84FF</color>         <color name="assistant_bubble">#1C1C1E</color>    </resources>

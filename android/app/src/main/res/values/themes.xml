@@ -12,6 +12,9 @@
         
         <item name="android:statusBarColor">@color/background</item>
         <item name="android:windowLightStatusBar">?attr/isLightTheme</item>
+
+        <item name="android:fontFamily">@font/myanmar_font</item>
+        <item name="fontFamily">@font/myanmar_font</item>
     </style>
 
     <style name="Theme.MyanmarRussianLearner.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />

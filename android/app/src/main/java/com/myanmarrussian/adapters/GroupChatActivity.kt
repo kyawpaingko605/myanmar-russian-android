@@ -21,7 +21,8 @@ class GroupChatActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_group_chat)
 
-        recyclerView = findViewById(R.id.recyclerView)
+        // XML ထဲက ID အမှန်ဖြစ်သော rv_group_messages သို့ ပြင်ဆင်ထားသည်
+        recyclerView = findViewById(R.id.rv_group_messages)
         recyclerView.layoutManager = LinearLayoutManager(this)
 
         groupChatAdapter = GroupChatAdapter(currentUserId = "user123")

@@ -26,7 +26,6 @@ app.post('/api/tutor', async (req, res) => {
       return res.status(400).json({ error: 'Message is required' });
     }
 
-    // 💡 ကျောင်းသားဆီက Header မှတစ်ဆင့် ကိုယ်ပိုင် API Key ပါလာပါက ၎င်းကို အသုံးပြုမည်၊ မပါပါက Server ရဲ့ Free Key ကို သုံးမည်။
     const activeApiKey = req.headers['x-gemini-api-key'] || DEFAULT_GEMINI_API_KEY;
 
     if (!activeApiKey) {
@@ -76,7 +75,6 @@ app.get('/api/vocabulary', async (req, res) => {
   try {
     const { level = 'A1' } = req.query;
 
-    // Vocabulary အတွက်လည်း Client Key ကို ဦးစားပေး စစ်ဆေးပေးခြင်း
     const activeApiKey = req.headers['x-gemini-api-key'] || DEFAULT_GEMINI_API_KEY;
 
     if (!activeApiKey) {
@@ -123,6 +121,38 @@ app.get('/api/vocabulary', async (req, res) => {
       success: false,
       error: 'Failed to generate vocabulary from AI'
     });
+  }
+});
+
+// 💡 ဤနေရာတွင် စမတ်ကျသော အသံထွက်ပေးမည့် TTS Endpoint အသစ်ကို ထပ်တိုးပေးထားပါသည်
+app.get('/api/tts', async (req, res) => {
+  try {
+    const { text } = req.query;
+    if (!text) {
+      return res.status(400).json({ error: 'Text is required' });
+    }
+
+    // စာသားထဲတွင် ရုရှားစာလုံး ပါမပါ စစ်ဆေးခြင်း
+    const hasRussian = /[а-яА-ЯёЁ]/.test(text);
+    const encodedText = encodeURIComponent(text);
+    
+    let audioUrl = "";
+    if (hasRussian) {
+      // ရုရှားစာသားဖြစ်ပါက ရုရှားအသံထွက်ပေးမည်
+      audioUrl = `https://translate.google.com/translate_tts?ie=UTF-8&tl=ru&client=tw-ob&q=${encodedText}`;
+    } else {
+      // မြန်မာစာသားဖြစ်ပါက မြန်မာအသံထွက်ပေးမည်
+      audioUrl = `https://translate.google.com/translate_tts?ie=UTF-8&tl=my&client=tw-ob&q=${encodedText}`;
+    }
+
+    res.json({
+      success: true,
+      audioUrl: audioUrl
+    });
+
+  } catch (error) {
+    console.error('TTS API error:', error);
+    res.status(500).json({ success: false, error: 'Failed to generate speech stream' });
   }
 });
 

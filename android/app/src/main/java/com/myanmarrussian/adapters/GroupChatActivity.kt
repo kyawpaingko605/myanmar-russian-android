@@ -14,19 +14,19 @@ import com.myanmarrussian.models.GroupMessage
 
 class GroupChatActivity : AppCompatActivity() {
 
-    private lateinit var recyclerView: RecyclerView
-    private lateinit var adapter: GroupChatAdapter
+    private lateinit var chatRecyclerView: RecyclerView
+    private lateinit var groupChatAdapter: GroupChatAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_group_chat)
 
-        recyclerView = findViewById(R.id.recyclerView)
-        recyclerView.layoutManager = LinearLayoutManager(this)
+        // XML ထဲက id နှင့် ကိုက်ညီအောင် ပြင်ဆင်ထားပါသည်
+        chatRecyclerView = findViewById(R.id.recyclerView)
+        chatRecyclerView.layoutManager = LinearLayoutManager(this)
 
-        // currentUserId နေရာတွင် မိမိအသုံးပြုမည့် ID ကို ထည့်သွင်းပါ
-        adapter = GroupChatAdapter(currentUserId = "user123")
-        recyclerView.adapter = adapter
+        groupChatAdapter = GroupChatAdapter(currentUserId = "user123")
+        chatRecyclerView.adapter = groupChatAdapter
     }
 }
 

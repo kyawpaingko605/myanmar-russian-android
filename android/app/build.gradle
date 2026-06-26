@@ -1,7 +1,8 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
-    id 'org.jetbrains.kotlin.kapt' // 💡 Room compiler အလုပ်လုပ်ရန် kapt plugin ထည့်သွင်းခြင်း
+    id 'org.jetbrains.kotlin.kapt' // Room compiler အလုပ်လုပ်ရန်
+    id 'com.google.gms.google-services' // 💬 Firebase google-services.json ဖိုင်ကို ဖတ်ရန် Plugin
 }
 
 android {
@@ -71,12 +72,15 @@ dependencies {
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'androidx.recyclerview:recyclerview:1.3.2'
 
-    // 💡 Room Database Libraries (အမြဲတမ်း စကားပြောမှတ်မိနေစေရန်)
+    // Room Database Libraries
     implementation 'androidx.room:room-runtime:2.6.1'
     implementation 'androidx.room:room-ktx:2.6.1'
     kapt 'androidx.room:room-compiler:2.6.1'
 
-    // 💡 ပြဿနာဖြစ်စေသော Rootbeer Library အား ဖယ်ထုတ်ပြီးပါပြီ (Native Code ဖြင့်သာ MainActivity တွင် စစ်ဆေးပါမည်)
+    // 💬 ⚡ Real-time Chat စနစ်အတွက် Firebase Packages များ ဖြည့်စွက်ခြင်း
+    implementation platform('com.google.firebase:firebase-bom:32.7.1') // Firebase ဗားရှင်းများကို ထိန်းချုပ်ရန် BOM
+    implementation 'com.google.firebase:firebase-database-ktx' // Realtime Database Package
+    implementation 'com.google.firebase:firebase-auth-ktx' // Authentication Package
 
     // Testing
     testImplementation 'junit:junit:4.13.2'

@@ -21,7 +21,7 @@
             android:id="@+id/btn_back"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:src="@android:drawable/abc_ic_ab_back_material"
+            android:src="?attr/homeAsUpIndicator"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:tint="@color/text_primary"
             android:contentDescription="Back" />

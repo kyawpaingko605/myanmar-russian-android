@@ -21,7 +21,6 @@ class GroupChatActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_group_chat)
 
-        // XML ထဲက ID အမှန်ဖြစ်သော rv_group_messages သို့ ပြင်ဆင်ထားသည်
         recyclerView = findViewById(R.id.rv_group_messages)
         recyclerView.layoutManager = LinearLayoutManager(this)
 
@@ -49,7 +48,7 @@ class GroupChatAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GroupMessageViewHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_group_message, parent, false)
+            .inflate(R.layout.item_group_message, parent, false) // XML ဖိုင်အမည် အမှန်အတိုင်း ပြောင်းထားသည်
         return GroupMessageViewHolder(view)
     }
 

@@ -12,7 +12,7 @@ import com.myanmarrussian.models.ChatMessage
 import java.net.URLEncoder
 
 /**
- * ChatMessageAdapter - Cross-device stable version using Network-based TTS for 100% Myanmar Voice support
+ * ChatMessageAdapter - Node.js Backend TTS နှင့် ချိတ်ဆက်ထားသော ဗားရှင်း
  */
 class ChatMessageAdapter(
     private val messages: MutableList<ChatMessage> = mutableListOf(),
@@ -35,7 +35,7 @@ class ChatMessageAdapter(
                 binding.assistantMessageContainer.visibility = View.VISIBLE
                 binding.tvAssistantMessage.text = message.text
 
-                // AI ရဲ့ စာသားကို ဖုန်းတိုင်းမှာ အသံထွက်နိုင်ရန် Network TTS ဖြင့် ဖွင့်မည်
+                // AI ရဲ့ စာသားကို ဖွင့်ရန် ကိုယ်ပိုင် Backend TTS စနစ်အား ခေါ်မည်
                 binding.btnPlayAudio.setOnClickListener {
                     playBilingualAudio(message.text, binding.root.context)
                     onPlayAudio(message)
@@ -45,11 +45,10 @@ class ChatMessageAdapter(
     }
 
     /**
-     * ရုရှားစာနှင့် မြန်မာစာကို API သုံး၍ ဖုန်းတိုင်းတွင် အသံထွက်စေမည့် စနစ်
+     * ရုရှားစာနှင့် မြန်မာစာကို ခွဲခြားပြီး ကိုယ်ပိုင် Backend နှင့် ချိတ်ဆက်အသံထွက်မည့်စနစ်
      */
     private fun playBilingualAudio(text: String, context: android.content.Context) {
         try {
-            // လက်ရှိ ဖွင့်နေတဲ့ အသံရှိရင် အရင်ရပ်ပေးမည်
             mediaPlayer?.stop()
             mediaPlayer?.release()
             mediaPlayer = null
@@ -57,27 +56,35 @@ class ChatMessageAdapter(
             val hasRussian = text.any { it in '\u0400'..'\u04FF' }
             val encodedText = URLEncoder.encode(text, "UTF-8")
             
-            // 💡 ဖုန်းထဲက TTS အစား အွန်လိုင်း API URL တစ်ခုခုကို ပြောင်းသုံးခြင်း (ဥပမာ Google TTS Public API)
+            // 💡 နေရာဒေသအလိုက် သို့မဟုတ် တင်ထားသည့် Node.js Backend Server URL ကို ထည့်ပေးရန်
+            // (ဥပမာ Local စမ်းသပ်နေပါက "http://10.0.2.2:3000" သို့မဟုတ် Render URL ထည့်ပါ)
+            val backendBaseUrl = "http://10.0.2.2:3000" 
+            
             val audioUrl = if (hasRussian) {
                 "https://translate.google.com/translate_tts?ie=UTF-8&tl=ru&client=tw-ob&q=$encodedText"
             } else {
-                "https://translate.google.com/translate_tts?ie=UTF-8&tl=my&client=tw-ob&q=$encodedText"
+                "$backendBaseUrl/api/tts?text=$encodedText"
             }
 
             Toast.makeText(context, "အသံဖိုင် ဖွင့်နေပါသည်...", Toast.LENGTH_SHORT).show()
 
-            // MediaPlayer ဖြင့် အသံဖိုင်လှမ်းဖွင့်ခြင်း
             mediaPlayer = MediaPlayer().apply {
-                setDataSource(audioUrl)
+                // Android 9 အထက် ဗားရှင်းများတွင် Stream ပိတ်မသွားစေရန် Header ထည့်သွင်းခြင်း
+                val headers = HashMap<String, String>()
+                headers["User-Agent"] = "Mozilla/5.0"
+                setDataSource(context, android.net.Uri.parse(audioUrl), headers)
+                
+                setAudioStreamType(android.media.AudioManager.STREAM_MUSIC)
+
                 setOnPreparedListener { 
                     start() 
                 }
                 setOnErrorListener { _, what, extra ->
                     Log.e("AudioPlayer", "Error playing audio: what=$what, extra=$extra")
-                    Toast.makeText(context, "အသံဖွင့်ရန် အင်တာနက် လိုအပ်ပါသည်", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "အသံဖွင့်ရန် အင်တာနက် သို့မဟုတ် Backend ချိတ်ဆက်မှု လိုအပ်ပါသည်", Toast.LENGTH_SHORT).show()
                     true
                 }
-                prepareAsync() // Network သုံးထားသဖြင့် နောက်ကွယ်မှ အလုပ်လုပ်စေရန် Async သုံးရမည်
+                prepareAsync() 
             }
 
         } catch (e: Exception) {
@@ -111,7 +118,6 @@ class ChatMessageAdapter(
         notifyDataSetChanged()
     }
 
-    // App ပိတ်သွားပါက Resource များကို ပြန်သိမ်းဆည်းခြင်း
     fun onDestroy() {
         mediaPlayer?.stop()
         mediaPlayer?.release()

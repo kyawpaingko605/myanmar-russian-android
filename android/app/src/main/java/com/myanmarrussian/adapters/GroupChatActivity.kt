@@ -1,13 +1,34 @@
 package com.myanmarrussian.adapters
 
+import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.myanmarrussian.R
 import com.myanmarrussian.models.GroupMessage
+
+class GroupChatActivity : AppCompatActivity() {
+
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var adapter: GroupChatAdapter
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_group_chat)
+
+        recyclerView = findViewById(R.id.recyclerView)
+        recyclerView.layoutManager = LinearLayoutManager(this)
+
+        // currentUserId နေရာတွင် မိမိအသုံးပြုမည့် ID ကို ထည့်သွင်းပါ
+        adapter = GroupChatAdapter(currentUserId = "user123")
+        recyclerView.adapter = adapter
+    }
+}
 
 class GroupChatAdapter(
     private val currentUserId: String
@@ -46,13 +67,11 @@ class GroupChatAdapter(
         private val tvMyMessage: TextView = itemView.findViewById(R.id.tv_my_message)
 
         fun bind(message: GroupMessage, currentUserId: String) {
-            // မိမိကိုယ်တိုင် ပို့သောစာ ဖြစ်ပါက ညာဘက်တွင်ပြမည်
             if (message.senderId == currentUserId || message.isStaticSender) {
                 myMessageContainer.visibility = View.VISIBLE
                 otherMessageContainer.visibility = View.GONE
                 tvMyMessage.text = message.text
             } else {
-                // အခြားသူများ ပို့သောစာ ဖြစ်ပါက ဘယ်ဘက်တွင် နာမည်နှင့်တကွပြမည်
                 otherMessageContainer.visibility = View.VISIBLE
                 myMessageContainer.visibility = View.GONE
                 tvSenderName.text = message.senderName

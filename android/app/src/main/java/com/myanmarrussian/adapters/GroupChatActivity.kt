@@ -12,6 +12,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.database.*
 import com.myanmarrussian.R
 import com.myanmarrussian.models.GroupMessage
 
@@ -23,12 +24,19 @@ class GroupChatActivity : AppCompatActivity() {
     private lateinit var btnSend: ImageButton
     private lateinit var btnBack: ImageButton
 
+    // 💬 Firebase Database Reference
+    private lateinit var databaseReference: DatabaseReference
+
     // 💡 စမ်းသပ်ရန် ယာယီ User ID (အစစ်အမှန်သုံးလျှင် Firebase Auth ID ထည့်ရပါမည်)
     private val currentUserId = "user123" 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_group_chat)
+
+        // 1. Firebase Realtime Database အား အသစ်ရရှိထားသော Singapore URL ဖြင့် ချိတ်ဆက်ခြင်း
+        val database = FirebaseDatabase.getInstance("https://myanmar-russian-learner-ca61b-default-rtdb.asia-southeast1.firebasedatabase.app/")
+        databaseReference = database.getReference("group_chat")
 
         // UI Component များကို ချိတ်ဆက်ခြင်း
         recyclerView = findViewById(R.id.rv_group_messages)
@@ -43,6 +51,9 @@ class GroupChatActivity : AppCompatActivity() {
         groupChatAdapter = GroupChatAdapter(currentUserId)
         recyclerView.adapter = groupChatAdapter
 
+        // Firebase ထဲမှ စာများကို Real-time ဖတ်ယူခြင်း စတင်ရန်
+        listenForMessages()
+
         // Back Button လုပ်ဆောင်ချက်
         btnBack.setOnClickListener {
             finish()
@@ -55,30 +66,51 @@ class GroupChatActivity : AppCompatActivity() {
                 sendMessage(messageText)
             }
         }
-
-        // 💡 ဥပမာ ဒေတာထည့်သွင်းပြသခြင်း (ဒေတာဘေ့စ်နှင့် ချိတ်ဆက်လျှင် ဤနေရာတွင် ရေးရပါမည်)
-        loadDummyMessages()
     }
 
+    // 💬 Firebase သို့ စာပို့ပေးမည့် မူလ Function ကို ပြင်ဆင်ခြင်း
     private fun sendMessage(text: String) {
+        val messageId = databaseReference.push().key ?: return
         val newMessage = GroupMessage(
             senderId = currentUserId,
             senderName = "ကျွန်တော်",
             text = text,
             timestamp = System.currentTimeMillis()
         )
-        groupChatAdapter.addMessage(newMessage)
-        etMessageInput.text.clear()
-        recyclerView.smoothScrollToPosition(groupChatAdapter.itemCount - 1)
+
+        databaseReference.child(messageId).setValue(newMessage)
+            .addOnSuccessListener {
+                etMessageInput.text.clear()
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "စာပို့ရန် အဆင်မပြေပါ- ${e.message}", Toast.LENGTH_SHORT).show()
+            }
     }
 
-    private fun loadDummyMessages() {
-        val dummyList = listOf(
-            GroupMessage("user456", "အောင်အောင်", "မင်္ဂလာပါ ရုရှားစာ လေ့လာနေသူများခင်ဗျာ", System.currentTimeMillis()),
-            GroupMessage("user789", "သီရိ", "Привет! အားလုံးပဲ မင်္ဂလာပါရှင်", System.currentTimeMillis()),
-            GroupMessage("user123", "ကျွန်တော်", "ဟုတ်ကဲ့ ဗဟုသုတတွေ အတူတူမျှဝေကြရအောင်", System.currentTimeMillis())
-        )
-        groupChatAdapter.setMessages(dummyList)
+    // 🔄 Firebase မှ ဒေတာများကို အချိန်နဲ့တပြေးညီ နားထောင်ပြီး Adapter ထဲ ထည့်ပေးသည့် Function
+    private fun listenForMessages() {
+        databaseReference.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val messageList = ArrayList<GroupMessage>()
+                for (messageSnapshot in snapshot.children) {
+                    val message = messageSnapshot.getValue(GroupMessage::class.java)
+                    if (message != null) {
+                        messageList.add(message)
+                    }
+                }
+                // မူလ Adapter ၏ setMessages ခေါ်ယူခြင်း
+                groupChatAdapter.setMessages(messageList)
+                
+                // စာအသစ်ရှိလျှင် အောက်ဆုံးသို့ ရွှေ့ပေးခြင်း
+                if (messageList.isNotEmpty()) {
+                    recyclerView.smoothScrollToPosition(groupChatAdapter.itemCount - 1)
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Toast.makeText(this@GroupChatActivity, "ဒေတာဖတ်မရပါ- ${error.message}", Toast.LENGTH_SHORT).show()
+            }
+        })
     }
 }
 

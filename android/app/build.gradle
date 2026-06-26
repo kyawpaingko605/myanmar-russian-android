@@ -2,7 +2,9 @@ plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
     id 'org.jetbrains.kotlin.kapt' // Room compiler အလုပ်လုပ်ရန်
-    id 'com.google.gms.google-services' // 💬 Firebase google-services.json ဖိုင်ကို ဖတ်ရန် Plugin
+    
+    // 💡 ⚡ Plugin ဗားရှင်းကို ရှာမတွေ့သည့် ပြဿနာအတွက် ဤနေရာတွင် ဗားရှင်း တိုက်ရိုက်သတ်မှတ်ပေးလိုက်ပါ
+    id 'com.google.gms.google-services' version '4.4.1'
 }
 
 android {
@@ -77,10 +79,10 @@ dependencies {
     implementation 'androidx.room:room-ktx:2.6.1'
     kapt 'androidx.room:room-compiler:2.6.1'
 
-    // 💬 ⚡ Real-time Chat စနစ်အတွက် Firebase Packages များ ဖြည့်စွက်ခြင်း
-    implementation platform('com.google.firebase:firebase-bom:32.7.1') // Firebase ဗားရှင်းများကို ထိန်းချုပ်ရန် BOM
-    implementation 'com.google.firebase:firebase-database-ktx' // Realtime Database Package
-    implementation 'com.google.firebase:firebase-auth-ktx' // Authentication Package
+    // Real-time Chat စနစ်အတွက် Firebase Packages များ
+    implementation platform('com.google.firebase:firebase-bom:32.7.1')
+    implementation 'com.google.firebase:firebase-database-ktx'
+    implementation 'com.google.firebase:firebase-auth-ktx'
 
     // Testing
     testImplementation 'junit:junit:4.13.2'

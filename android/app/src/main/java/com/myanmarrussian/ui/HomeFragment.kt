@@ -1,5 +1,6 @@
 package com.myanmarrussian.ui
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -7,6 +8,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.myanmarrussian.R
+import com.myanmarrussian.adapters.GroupChatActivity
 import com.myanmarrussian.databinding.FragmentHomeBinding
 
 /**
@@ -45,10 +47,10 @@ class HomeFragment : Fragment() {
             findNavController().navigate(R.id.nav_tutor)
         }
 
-        // 💬 နှိပ်လိုက်ပါက လူအချင်းချင်း စကားပြောမည့် Group Chat သို့ သွားရန် ချိတ်ဆက်ခြင်း
-        // ⚠️ မှတ်ချက် - မိမိ fragment_home.xml ထဲရှိ Group Chat ခလုတ်၏ ID အတိုင်း မှန်ကန်စွာ စစ်ဆေးပါ
+        // 💬 ⚡ Crash လုံးဝမဖြစ်စေရန် တိုက်ရိုက် Intent စနစ်ဖြင့် GroupChatActivity ကို ခေါ်ယူခြင်း
         binding.cardGroupChat.setOnClickListener {
-            findNavController().navigate(R.id.navigation_group_chat)
+            val intent = Intent(requireContext(), GroupChatActivity::class.java)
+            startActivity(intent)
         }
     }
 

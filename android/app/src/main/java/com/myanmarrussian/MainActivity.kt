@@ -5,7 +5,7 @@ import android.net.ConnectivityManager
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
-import android.os.Looper
+import import android.os.Looper
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -21,15 +21,14 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        // 🌓 ⚡ [ဖြည့်စွက်ချက်] App စဖွင့်လိုက်တာနဲ့ သိမ်းဆည်းထားဖူးတဲ့ Theme mode ကို အရင်ဆုံး ဖတ်ယူပြီး သက်ရောက်စေခြင်း
-        // အခြား ကုဒ်တွေ အလုပ်မလုပ်ခင် Theme ကို အရင်ပြောင်းထားမှ တစ်ဖန်ပြန်ပွင့်လာတဲ့အခါ (Recreate ဖြစ်တဲ့အခါ) ကမောက်ကမ မဖြစ်မှာပါ
+        // 🌓 ⚡ App စဖွင့်လိုက်တာနဲ့ သိမ်းဆည်းထားဖူးတဲ့ Theme mode ကို အရင်ဆုံး ဖတ်ယူပြီး သက်ရောက်စေခြင်း
         val sharedPref = getSharedPreferences("AppState", Context.MODE_PRIVATE)
         val savedTheme = sharedPref.getInt("APP_THEME_MODE", AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
         AppCompatDelegate.setDefaultNightMode(savedTheme)
 
         super.onCreate(savedInstanceState)
         
-        // 💡 ၁။ မူရင်းကုဒ်အတိုင်း View ကို အရင်ဆုံး အောင်မြင်စွာ တည်ဆောက်ခြင်း (လုံးဝမပြင်ပါ)
+        // 💡 ၁။ View ကို အရင်ဆုံး အောင်မြင်စွာ တည်ဆောက်ခြင်း
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -44,10 +43,24 @@ class MainActivity : AppCompatActivity() {
         bottomNav.itemIconTintList = resources.getColorStateList(R.color.nav_item_color, theme)
         bottomNav.itemTextColor = resources.getColorStateList(R.color.nav_item_color, theme)
 
-        // 💡 ၂။ ဖုန်းတိုင်းတွင် လုံးဝ Crash မဖြစ်စေရန် Handler (MainLooper) သုံးပြီး ဘေးကင်းစွာ စစ်ဆေးခြင်း
+        // 💡 ၂။ ဖုန်းတိုင်းတွင် လုံးဝ Crash မဖြစ်စေရန် Handler သုံးပြီး ဘေးကင်းစွာ စစ်ဆေးခြင်း
         Handler(Looper.getMainLooper()).post {
             checkSecurityAndInternet()
         }
+    }
+
+    /**
+     * ⚙️ အသုံးပြုသူမှ Light/Dark/Auto Theme ကို ကိုယ်တိုင်ရွေးချယ်ပြောင်းလဲချိန်တွင် ခေါ်ယူရန် Function
+     * (ဥပမာ - Settings ထဲတွင် ခလုတ်နှိပ်ပြီး ပြောင်းလဲသည့်အခါ ခေါ်သုံးနိုင်သည်)
+     * @param themeMode AppCompatDelegate.MODE_NIGHT_NO (သို့) MODE_NIGHT_YES (သို့) MODE_NIGHT_FOLLOW_SYSTEM
+     */
+    fun updateAppTheme(themeMode: Int) {
+        // SharedPreferences ထဲတွင် အမြဲတမ်းသိမ်းဆည်းထားမည်
+        val sharedPref = getSharedPreferences("AppState", Context.MODE_PRIVATE)
+        sharedPref.edit().putInt("APP_THEME_MODE", themeMode).apply()
+        
+        // Theme ကို ချက်ချင်းပြောင်းလဲသက်ရောက်စေမည်
+        AppCompatDelegate.setDefaultNightMode(themeMode)
     }
 
     private fun checkSecurityAndInternet() {
@@ -71,13 +84,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * 💡 ဖုန်းမော်ဒယ်စုံ (Oppo, Vivo, Samsung) တို့တွင် Theme Error ကြောင့် Crash ဖြစ်ခြင်းမှ ရာနှုန်းပြည့်ကာကွယ်ပေးသော စနစ်
+     * 💡 ဖုန်းမော်ဒယ်စုံ (Oppo, Vivo, Samsung) တို့တွင် Theme Error ကြောင့် Crash ဖြစ်ခြင်းမှ ကာကွယ်ပေးသော စနစ်
      */
     private fun showUniversalSafeWarning(title: String, message: String) {
         if (isFinishing || isDestroyed) return
 
         try {
-            // ပုံမှန် Dialog ဖြင့် အရင်ကြိုးစားပြသခြင်း
             AlertDialog.Builder(this)
                 .setTitle(title)
                 .setMessage(message)
@@ -87,7 +99,6 @@ class MainActivity : AppCompatActivity() {
                 }
                 .show()
         } catch (e: Exception) {
-            // Theme Error ကြောင့် Dialog ဆောက်မရပါက Toast သို့ ပြောင်းလဲပေးပြီး Crash မဖြစ်အောင် တားဆီးခြင်း
             Toast.makeText(applicationContext, "$title\n$message", Toast.LENGTH_LONG).show()
             Handler(Looper.getMainLooper()).postDelayed({
                 finishAffinity()
@@ -124,7 +135,7 @@ class MainActivity : AppCompatActivity() {
             val networkInfo = connectivityManager.activeNetworkInfo
             networkInfo != null && networkInfo.isConnected
         } catch (e: Exception) {
-            true // Error ဖြစ်လျှင်လည်း Crash မဖြစ်စေဘဲ ဝင်ခွင့်ပေးရန်
+            true
         }
     }
 }

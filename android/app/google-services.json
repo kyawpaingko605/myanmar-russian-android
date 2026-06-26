@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "897525763374",
+    "project_id": "myanmar-russian-learner",
+    "storage_bucket": "myanmar-russian-learner.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:897525763374:android:753599bd4c4ef140087ebf",
+        "android_client_info": {
+          "package_name": "com.myanmarrussianlearner"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAbUhslxGW_uMxJWWmnugKMxhRqcABMPy4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

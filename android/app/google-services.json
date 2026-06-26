@@ -2,6 +2,7 @@
   "project_info": {
     "project_number": "897525763374",
     "project_id": "myanmar-russian-learner",
+    "firebase_url": "https://myanmar-russian-learner-default-rtdb.asia-southeast1.firebasedatabase.app/",
     "storage_bucket": "myanmar-russian-learner.firebasestorage.app"
   },
   "client": [

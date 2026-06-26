@@ -1,8 +1,7 @@
 package com.myanmarrussian.adapters
 
-import android.content.Intent
-import android.provider.Settings
-import android.speech.tts.TextToSpeech
+import android.media.MediaPlayer
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,18 +9,17 @@ import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.myanmarrussian.databinding.ItemChatMessageBinding
 import com.myanmarrussian.models.ChatMessage
-import java.util.Locale
+import java.net.URLEncoder
 
 /**
- * ChatMessageAdapter - RecyclerView adapter for chat messages with intelligent bilingual TTS and direct voice data download redirect
+ * ChatMessageAdapter - Cross-device stable version using Network-based TTS for 100% Myanmar Voice support
  */
 class ChatMessageAdapter(
     private val messages: MutableList<ChatMessage> = mutableListOf(),
-    private val onPlayAudio: (ChatMessage) -> Unit = {} // Option အနေဖြင့် ချန်ထားပေးပါသည်
-) : RecyclerView.Adapter<ChatMessageAdapter.MessageViewHolder>(), TextToSpeech.OnInitListener {
+    private val onPlayAudio: (ChatMessage) -> Unit = {}
+) : RecyclerView.Adapter<ChatMessageAdapter.MessageViewHolder>() {
 
-    private var tts: TextToSpeech? = null
-    private var isTtsReady = false
+    private var mediaPlayer: MediaPlayer? = null
 
     inner class MessageViewHolder(
         private val binding: ItemChatMessageBinding
@@ -29,19 +27,17 @@ class ChatMessageAdapter(
 
         fun bind(message: ChatMessage) {
             if (message.role == ChatMessage.MessageRole.USER) {
-                // Show user message (right side)
                 binding.userMessageContainer.visibility = View.VISIBLE
                 binding.assistantMessageContainer.visibility = View.GONE
                 binding.tvUserMessage.text = message.text
             } else {
-                // Show assistant message (left side)
                 binding.userMessageContainer.visibility = View.GONE
                 binding.assistantMessageContainer.visibility = View.VISIBLE
                 binding.tvAssistantMessage.text = message.text
 
-                // AI ရဲ့ စာသားကို အသံထွက်စနစ်ဖြင့် စမတ်ကျကျ ဖတ်မည်
+                // AI ရဲ့ စာသားကို ဖုန်းတိုင်းမှာ အသံထွက်နိုင်ရန် Network TTS ဖြင့် ဖွင့်မည်
                 binding.btnPlayAudio.setOnClickListener {
-                    speakBilingualText(message.text, binding.root.context)
+                    playBilingualAudio(message.text, binding.root.context)
                     onPlayAudio(message)
                 }
             }
@@ -49,62 +45,48 @@ class ChatMessageAdapter(
     }
 
     /**
-     * ရုရှားစာနှင့် မြန်မာစာကို ခွဲခြားပြီး အသံထွက်ပီပြင်စွာ လှည့်လည်ဖတ်ပေးမည့် စနစ်
+     * ရုရှားစာနှင့် မြန်မာစာကို API သုံး၍ ဖုန်းတိုင်းတွင် အသံထွက်စေမည့် စနစ်
      */
-    private fun speakBilingualText(text: String, context: android.content.Context) {
-        if (!isTtsReady || tts == null) {
-            Toast.makeText(context, "အသံထွက်စနစ် အဆင်သင့်မဖြစ်သေးပါ", Toast.LENGTH_SHORT).show()
-            return
-        }
+    private fun playBilingualAudio(text: String, context: android.content.Context) {
+        try {
+            // လက်ရှိ ဖွင့်နေတဲ့ အသံရှိရင် အရင်ရပ်ပေးမည်
+            mediaPlayer?.stop()
+            mediaPlayer?.release()
+            mediaPlayer = null
 
-        val hasRussian = text.any { it in '\u0400'..'\u04FF' }
-
-        if (hasRussian) {
-            // ရုရှားစာလုံးများ ပါဝင်နေပါက ရုရှား လေယူလေသိမ်းစစ်စစ်ဖြင့် အရင်ဖတ်ပေးမည်
-            tts?.language = Locale("ru", "RU")
-            tts?.setSpeechRate(0.85f)
-            tts?.speak(text, TextToSpeech.QUEUE_FLUSH, null, "chat_tts")
-        } else {
-            // မြန်မာရှင်းလင်းချက် သီးသန့်ဖြစ်ပါက မြန်မာအသံစနစ်သို့ ပြောင်းလဲဖတ်ပေးမည်
-            val result = tts?.setLanguage(Locale("my", "MM"))
+            val hasRussian = text.any { it in '\u0400'..'\u04FF' }
+            val encodedText = URLEncoder.encode(text, "UTF-8")
             
-            if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-                // 💡 မြန်မာ Voice Pack မရှိပါက ပေါ့ပ်အပ်ပြပြီး Google Voice Data ဒေါင်းလုဒ်စာမျက်နှာသို့ တိုက်ရိုက် ခုန်ကျော်ဖွင့်ပေးခြင်း
-                Toast.makeText(context, "မြန်မာအသံဒေတာ မရှိသေးပါ။ ဒေါင်းလုဒ်စာမျက်နှာသို့ တိုက်ရိုက်ပို့ပေးနေပါသည်...", Toast.LENGTH_LONG).show()
-                
-                try {
-                    // Correct implementation for direct intent launch
-                    val intent = Intent(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA).apply {
-                        setPackage("com.google.android.tts")
-                        flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                    }
-                    context.startActivity(intent)
-                } catch (e: Exception) {
-                    // အကယ်၍ Intent တိုက်ရိုက်သွားရခက်ပါက အထွေထွေ TTS Settings ကို ဖွင့်ပေးခြင်း
-                    try {
-                        val intent = Intent("com.android.settings.TTS_SETTINGS").apply {
-                            flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                        }
-                        context.startActivity(intent)
-                    } catch (ex: Exception) {
-                        val intent = Intent(Settings.ACTION_SETTINGS).apply {
-                            flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                        }
-                        context.startActivity(intent)
-                    }
-                }
+            // 💡 ဖုန်းထဲက TTS အစား အွန်လိုင်း API URL တစ်ခုခုကို ပြောင်းသုံးခြင်း (ဥပမာ Google TTS Public API)
+            val audioUrl = if (hasRussian) {
+                "https://translate.google.com/translate_tts?ie=UTF-8&tl=ru&client=tw-ob&q=$encodedText"
             } else {
-                tts?.setSpeechRate(1.0f)
-                tts?.speak(text, TextToSpeech.QUEUE_FLUSH, null, "chat_tts")
+                "https://translate.google.com/translate_tts?ie=UTF-8&tl=my&client=tw-ob&q=$encodedText"
             }
+
+            Toast.makeText(context, "အသံဖိုင် ဖွင့်နေပါသည်...", Toast.LENGTH_SHORT).show()
+
+            // MediaPlayer ဖြင့် အသံဖိုင်လှမ်းဖွင့်ခြင်း
+            mediaPlayer = MediaPlayer().apply {
+                setDataSource(audioUrl)
+                setOnPreparedListener { 
+                    start() 
+                }
+                setOnErrorListener { _, what, extra ->
+                    Log.e("AudioPlayer", "Error playing audio: what=$what, extra=$extra")
+                    Toast.makeText(context, "အသံဖွင့်ရန် အင်တာနက် လိုအပ်ပါသည်", Toast.LENGTH_SHORT).show()
+                    true
+                }
+                prepareAsync() // Network သုံးထားသဖြင့် နောက်ကွယ်မှ အလုပ်လုပ်စေရန် Async သုံးရမည်
+            }
+
+        } catch (e: Exception) {
+            Log.e("AudioPlayer", "Exception: ${e.message}")
+            Toast.makeText(context, "အသံထွက်စနစ် ချို့ယွင်းချက်ရှိနေပါသည်", Toast.LENGTH_SHORT).show()
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessageViewHolder {
-        if (tts == null) {
-            tts = TextToSpeech(parent.context.applicationContext, this)
-        }
-
         val binding = ItemChatMessageBinding.inflate(
             LayoutInflater.from(parent.context),
             parent,
@@ -119,12 +101,6 @@ class ChatMessageAdapter(
 
     override fun getItemCount(): Int = messages.size
 
-    override fun onInit(status: Int) {
-        if (status == TextToSpeech.SUCCESS) {
-            isTtsReady = true
-        }
-    }
-
     fun addMessage(message: ChatMessage) {
         messages.add(message)
         notifyItemInserted(messages.size - 1)
@@ -135,9 +111,10 @@ class ChatMessageAdapter(
         notifyDataSetChanged()
     }
 
-    // App ပိတ်သွားပါက Resource များ ပြန်ပိတ်ပေးခြင်း
+    // App ပိတ်သွားပါက Resource များကို ပြန်သိမ်းဆည်းခြင်း
     fun onDestroy() {
-        tts?.stop()
-        tts?.shutdown()
+        mediaPlayer?.stop()
+        mediaPlayer?.release()
+        mediaPlayer = null
     }
 }
